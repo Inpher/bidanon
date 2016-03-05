@@ -8,6 +8,7 @@ var SIGN_ALGORITHM={
 		name: "RSA-PSS", 
 		modulusLength: 2048, 
 		publicExponent: new Uint8Array([0x01, 0x00, 0x01]), 
+		saltLength: 0,
 		hash: {name: "SHA-256"}};
 var RSA_ENCRYPT_ALGORITHM={name: "RSA-OAEP", 
 		modulusLength: 2048, 
@@ -49,7 +50,7 @@ function stringToArrayBuffer(string) {
 }
 
 function arrayBufferToString(bytes) {
-       var encoder = new TextEncoder("utf-8");
+       var encoder = new TextDecoder("utf-8");
        return encoder.decode(bytes);
 }
 
