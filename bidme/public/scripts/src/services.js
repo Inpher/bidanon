@@ -51,8 +51,11 @@ define(['angular'], function (angular) {
             getPeople : function(refresh){
                 return _promisesGetter('GET','/api/people', null, "people", refresh);
             },
-            getBids : function(refresh){
-                return _promisesGetter('GET','/api/bids', null, "bids", refresh);
+            getBids : function(refresh, u_id){
+                return _promisesGetter('GET','/api/bids/'+u_id, null, "bids", refresh);
+            },
+            getRequests : function(refresh){
+                return _promisesGetter('GET','/api/requests', null, "requests", refresh);
             },
             createBid : function(bid){
                 return _ajaxRequest('POST', '/api/bid', bid, null);
@@ -73,6 +76,7 @@ define(['angular'], function (angular) {
                 return _ajaxRequest('PUT', '/api/person/'+person._id, {person : person}, null);
             },
             signup : function(user){
+                console.log(user);
                 return _ajaxRequest('POST', '/api/signup', user, null);
             },
             login : function(user){
