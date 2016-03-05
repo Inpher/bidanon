@@ -97,7 +97,7 @@ define(['angular'], function (angular) {
         var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
         var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "check_password" : enc_check_password.toString() };
+        var user = {"username": vm.username, "password": enc_password.toString(), "type": "CLIENT", "check_password" : enc_check_password.toString() };
 
         if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
             if(vm.password !== vm.check_password){
