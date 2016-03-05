@@ -6,7 +6,7 @@ module.exports = function(connection) {
 
     var pritaveProfileSchema = new Schema({
         info: String,
-        u_id: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+        u_id: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
     });
 
     var PrivateProfile = connection.model('PrivateProfile', pritaveProfileSchema);

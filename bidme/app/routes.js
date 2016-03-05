@@ -60,6 +60,10 @@ module.exports = function(app, passport,models) {
     app.get('/api/requests', showClientRequest, passport.authenticate('local-authorization', {
         session: false
     }),api.getRequests);
+    
+    app.get('/api/infoRequest/:id', showClientRequest, passport.authenticate('local-authorization', {
+        session: false
+    }),api.getInfoRequest);
 
     app.post('/api/request', showClientRequest, passport.authenticate('local-authorization', {
         session: false

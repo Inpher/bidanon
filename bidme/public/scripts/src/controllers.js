@@ -8,6 +8,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
+    mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
     mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
@@ -145,8 +146,29 @@ define(['angular'], function (angular) {
         }
     };
 
+    
+    function InfoRequestCtrl(ResourceService, data, toastr) {
+        var vm = this;
+        vm.bid = null;
+        vm.data = data;
+        vm.ResourceService = ResourceService;
+        vm.toastr = toastr;
+        vm.profile = data[0].profile;
 
-    function HomeCtrl(ResourceService, data, localStorageService,toastr)
+    };
+
+    InfoRequestCtrl.prototype.placeBid = function(index){
+        var vm = this;
+        var bid = {intRate: vm.interestRate, maturity: vm.maturity};
+        vm.ResourceService.placeBid(bid).then(function(){
+            vm.toastr.success("Bid Added!");
+        },function(data, status) {
+            if(status!==401){
+                vm.toastr.error(data);
+            }
+        });
+    }
+    function HomeCtrl(ResourceService, data, localStorageService, toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
@@ -156,7 +178,7 @@ define(['angular'], function (angular) {
 
         vm.request = data[0].requests;
         vm.bids = data[1].bids;
-    }
+    };
 
     HomeCtrl.prototype.updatePerson = function(index, modify)
     {

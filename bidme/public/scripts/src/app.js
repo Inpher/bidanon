@@ -111,10 +111,15 @@ define([
                     controllerAs: 'vm',
                     access: { requiredLogin: true }
                 }).
-                when('/pubRequest', {
-                    templateUrl: 'partials/auth/pubRequest',
-                    controller: 'RequestCtrl',
+                when('/infoRequest/:id', {
+                    templateUrl: 'partials/auth/infoRequest',
+                    controller: 'InfoRequestCtrl',
                     controllerAs: 'vm',
+                    resolve: {
+                        data : function(Resolver,ResourceService, $route){
+                            return Resolver(ResourceService.getInfoRequest($route.current.params.id));
+                        }
+                    },
                     access: { requiredLogin: true }
                 }).
                 when('/profile', {

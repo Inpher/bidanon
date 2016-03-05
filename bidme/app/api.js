@@ -131,6 +131,7 @@ module.exports = function(models){
             });
 
         },
+
         updateBid: function(req,res)
         {
             var _id = req.params.id;
@@ -202,6 +203,22 @@ module.exports = function(models){
             Bid.find({ "u_id":  _id},function(err,bids){
                 res.json({bids: bids });
             });
+        },
+        getInfoRequest: function (req,res) {
+            var _id = req.params.id;
+            var profile={};
+            Request.findOne({ "_id":  _id}, function(err,request){
+                profile.request = request;
+                console.log( profile.request);
+                console.log(profile.request.u_id);
+                PublicProfile.findOne({"u_id": profile.request.u_id}, function(err,publicProfile){
+                    profile.publicProfile = publicProfile;
+                    res.json({profile:profile});
+                    console.log(profile.publicProfile);
+            });
+        });
+            
+
         }
     }
 
