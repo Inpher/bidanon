@@ -213,7 +213,7 @@ module.exports = function(models){
                 console.log(profile.request.u_id);
                 PublicProfile.findOne({"u_id": profile.request.u_id}, function(err,publicProfile){
                     profile.publicProfile = publicProfile;
-                    res.json([{profile:profile}]);
+                    res.json({profile:profile});
                     console.log(profile.publicProfile);
             });
         });
