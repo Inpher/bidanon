@@ -47,8 +47,12 @@ module.exports = function(models){
                     res.send(500, {'message': err});
                 // check to see if theres already a user with that email
                 if (profile) {
-                    res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id,"profile_id":profile._id
-        encKeyRing:req.user.encKeyRing});
+                    res.json({ 
+			auth_token: req.user.token.auth_token, 
+			type:req.user.type, 
+			"_id":req.user._id,
+			"profile_id":profile._id,
+			encKeyRing:req.user.encKeyRing});
                 }
             });
 	    console.log(req.user);

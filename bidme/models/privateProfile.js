@@ -4,12 +4,13 @@ module.exports = function(connection) {
 
     var Schema = mongoose.Schema;
 
-    var pritaveProfileSchema = new Schema({
-        info: String,
+    var privateProfileSchema = new Schema({
+        encInfo: String,
+	encKey: String,
         u_id: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
     });
 
-    var PrivateProfile = connection.model('PrivateProfile', pritaveProfileSchema);
+    var PrivateProfile = connection.model('PrivateProfile', privateProfileSchema);
 
     return PrivateProfile;
 }
