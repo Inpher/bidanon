@@ -7,7 +7,7 @@ module.exports = function(connection) {
     var requestSchema = new Schema({
         amount: String,
         maturity: Number,
-        u_id: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+        u_id: mongoose.Schema.Types.ObjectId,
         
     });
 

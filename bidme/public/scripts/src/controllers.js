@@ -5,9 +5,10 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('NavCtrl', ['$location', 'localStorageService', 'AuthenticationService', NavCtrl]);
     mainAppControllers.controller('LoginCtrl', ['$location', 'ResourceService' ,'CryptoJSService', 'localStorageService', 'toastr' ,LoginCtrl]);
     mainAppControllers.controller('RegistrationCtrl', ['ResourceService', 'CryptoJSService', 'toastr', RegistrationCtrl]);
-    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
+    mainAppControllers.controller('HomeCtrl', ['$location', 'ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
+    mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
     mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
@@ -156,8 +157,29 @@ define(['angular'], function (angular) {
         }
     };
 
+    
+    function InfoRequestCtrl(ResourceService, data, toastr) {
+        var vm = this;
+        vm.bid = null;
+        vm.data = data;
+        vm.ResourceService = ResourceService;
+        vm.toastr = toastr;
+        vm.profile = data[0].profile;
+    };
 
-    function HomeCtrl(ResourceService, data, localStorageService,toastr)
+    InfoRequestCtrl.prototype.placeBid = function(index){
+        var vm = this;
+        var bid = {intRate: vm.interestRate, maturity: vm.maturity};
+        vm.ResourceService.placeBid(bid).then(function(){
+            vm.toastr.success("Bid Added!");
+        },function(data, status) {
+            if(status!==401){
+                vm.toastr.error(data);
+            }
+        });
+    };
+
+    function HomeCtrl($location, ResourceService, data, localStorageService,toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
@@ -165,10 +187,10 @@ define(['angular'], function (angular) {
         vm.toastr = toastr;
         vm.type = localStorageService.get('type');
 
-        vm.request = data[0].requests;
+        vm.requests = data[0].requests;
         vm.bids = data[1].bids;
+        vm.$location = $location;
     }
-
     HomeCtrl.prototype.updatePerson = function(index, modify)
     {
         var vm = this;
@@ -238,6 +260,13 @@ define(['angular'], function (angular) {
             }
         });
     };
+
+    HomeCtrl.prototype.showProfile = function(request)
+    {
+        var vm = this;
+        var id = request._id;
+        vm.$location.path('/infoRequest/' + id);
+    }
 
     function PersonCtrl(ResourceService, toastr) {
         var vm = this;
