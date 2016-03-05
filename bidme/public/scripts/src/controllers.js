@@ -284,9 +284,12 @@ define(['angular'], function (angular) {
     }
 
     ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
-      vm.finScore = { score : 94 };
-      vm.avgIncome = { income : 9000};
-      vm.avgSpendings = { spendings : 3000};
+      vm.finProfile = {
+        score : 94 },
+        avgIncome : 9000},
+        avgSpendings : 3000},
+      };
+
       console.log("test");
       var vm = this;
       var reader = new FileReader();
@@ -300,9 +303,6 @@ define(['angular'], function (angular) {
         reader.readAsText(file);
         console.log(file);
         console.log(reader);
-
-        vm.finScore = { score : 94 };
-
       }
     }
 
