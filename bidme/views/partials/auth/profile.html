@@ -21,7 +21,8 @@
                           <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
                             <b>Please select exported financial data:</b>
                             <br></br>
-                            <input type="file" ngf-select="vm.uploadFile($files)" multiple>
+                            <input id='dataFileList' type="file" ngf-select>
+                            <!--- <button ng-click="vm.updateFileList()">submit</button> -->
                           </div>
                         </div>
                         <div class="checkbox">

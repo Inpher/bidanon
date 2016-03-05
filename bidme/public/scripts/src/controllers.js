@@ -11,7 +11,6 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
     mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
-    mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
 
     function ProvaCtrl() {
         var vm = this;
@@ -110,10 +109,10 @@ define(['angular'], function (angular) {
 	    var salt = vm.username;
 	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-	    var user = { 
-		"username": vm.username, 
-		"password": enc_password.toString(), 
-		"type": "CLIENT", 
+	    var user = {
+		"username": vm.username,
+		"password": enc_password.toString(),
+		"type": "CLIENT",
 		"encKeyRing": ekr,
 	    };
 
@@ -143,10 +142,10 @@ define(['angular'], function (angular) {
 	    var salt = vm.username;
 	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-	    var user = { 
-		"username": vm.username, 
-		"password": enc_password.toString(), 
-		"type": "BANK", 
+	    var user = {
+		"username": vm.username,
+		"password": enc_password.toString(),
+		"type": "BANK",
 		"encKeyRing": ekr,
 	    };
 
@@ -162,7 +161,7 @@ define(['angular'], function (angular) {
 	});
     };
 
-    
+
     function InfoRequestCtrl(ResourceService, data, toastr) {
         var vm = this;
         vm.bid = null;
@@ -362,7 +361,7 @@ define(['angular'], function (angular) {
       var timeSpan = (lastTimestamp - firstTimestamp)/(Date.parse("Sept 12 2016")-Date.parse("Aug 12 2016"));
 
       return {
-        score: computeFinScore(avgIncome,avgSpendings),
+        score: computeFinScore(pos/timeSpan,neg/timeSpan),
         avgIncome: pos/timeSpan,
         avgSpendings: neg/timeSpan,
       };
@@ -383,7 +382,12 @@ define(['angular'], function (angular) {
       console.log(vm.dataSources)
       if (vm.dataSources.isFinancialOn) {
         console.log("financial");
-        Profile.profile.financial = computeFinProfile();
+        //Profile.profile.financial = vm.updateFileList();
+        var futureProfile = vm.updateFileList();
+        futureProfile.then(function (res) {
+          Profile.profile.financial = res;
+          vm.ResourceService.createProfile(Profile);
+        });
       }
       if (vm.dataSources.isSocialOn) {
         console.log("social");
@@ -391,33 +395,27 @@ define(['angular'], function (angular) {
       if (vm.dataSources.isHealthOn) {
         console.log("health");
       }
-
-      vm.ResourceService.createProfile(Profile);
     };
 
-    function ComputeFinDataScoreCtrl(ResourceService, toastr)
-    {
-	   var vm = this;
-      vm.finProfile = {
-        score : 94,
-        avgIncome : 9000,
-        avgSpendings : 3000,
-      };
-    }
-
-    ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
+    ProfileCtrl.prototype.updateFileList = function(){
       var vm = this;
       var fileList = $('#dataFileList').prop('files');
       var reader = new FileReader();
 
+      console.log("toto");
+
       var file = fileList.item(0);
+      var promise = new Promise(function(resolve,reject){
+        reader.onloadend = function(e) {
+          var text = reader.result;
+          vm.finProfile = computeFinProfile(text);
+          resolve(vm.finProfile);
+        }
 
-      reader.onloadend = function(e) {
-        var text = reader.result;
-        computeFinProfile(text);
-      }
+        reader.readAsText(file);
+      })
 
-      reader.readAsText(file);
+      return promise;
     }
 
     return mainAppControllers;
