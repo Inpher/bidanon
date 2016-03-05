@@ -8,6 +8,7 @@ var SIGN_ALGORITHM={
 		name: "RSA-PSS", 
 		modulusLength: 2048, 
 		publicExponent: new Uint8Array([0x01, 0x00, 0x01]), 
+		saltLength: 0,
 		hash: {name: "SHA-256"}};
 var RSA_ENCRYPT_ALGORITHM={name: "RSA-OAEP", 
 		modulusLength: 2048, 
@@ -49,7 +50,7 @@ function stringToArrayBuffer(string) {
 }
 
 function arrayBufferToString(bytes) {
-       var encoder = new TextEncoder("utf-8");
+       var encoder = new TextDecoder("utf-8");
        return encoder.decode(bytes);
 }
 
@@ -241,8 +242,8 @@ function encrypt(jsonStr, pkeyEncrypt) {
 	}).then(function(ctBytes) {
 	    ctb64 = arrayBufferToBase64(ctBytes);
 	    return crypto.subtle.exportKey("raw", aesSessionKey);
-	}).then(function(keyStr) {
-	    aesSessionKeyBytes = stringToArrayBuffer(keyStr);
+	}).then(function(keyBytes) {
+	    aesSessionKeyBytes = keyBytes;
 	    return crypto.subtle.encrypt(RSA_ENCRYPT_ALGORITHM, pkeyEncrypt, aesSessionKeyBytes); 
 	}).then(function(encSessionKeyBytes) {
 	    return resolve({"ct": ctb64, "enckey": arrayBufferToBase64(encSessionKeyBytes)}); 
@@ -255,11 +256,11 @@ function encrypt(jsonStr, pkeyEncrypt) {
 function decrypt(ct, skeyEncrypt) {
     return new Promise(function(resolve, reject) {
 	var encAesBytes = base64ToArrayBuffer(ct["enckey"]); 
-	crypto.subtle.decrypt("RSA_ENCRYPT_ALGORITHM", skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
-	    return crypto.subtle.importKey("raw", aeskeyBytes, AES_ENCRYPT_ALGORITHM, true, ["encrypt", "decrypt"]); 
+	crypto.subtle.decrypt(RSA_ENCRYPT_ALGORITHM, skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
+	    return crypto.subtle.importKey("raw", aeskeyBytes, AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV, true, ["encrypt", "decrypt"]); 
 	}).then(function(aesKey) {
 	    var ctBytes = base64ToArrayBuffer(ct["ct"]); 
-	    return crypto.subtle.decrypt("AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV", aesKey, ctBytes);
+	    return crypto.subtle.decrypt(AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV, aesKey, ctBytes);
 	}).then(function(ptBytes) {
 	    return resolve(arrayBufferToString(ptBytes)); 
 	}).catch(function(err) { return reject(err)}); 
@@ -269,7 +270,7 @@ function decrypt(ct, skeyEncrypt) {
 function reencryptSessionKey(encAesKey, skeyEncrypt, pkeyEncryptDest) {
     return new Promise(function(resolve, reject) {
 	var encAesBytes = base64ToArrayBuffer(encAesKey);
-	crypto.subtle.decrypt("RSA_ENCRYPT_ALGORITHM", skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
+	crypto.subtle.decrypt(RSA_ENCRYPT_ALGORITHM, skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
 	    return crypto.subtle.encrypt(RSA_ENCRYPT_ALGORITHM, pkeyEncryptDest, aeskeyBytes); 
 	}).then(function(newEncKeyBytes) {
 	    return resolve(arrayBufferToBase64(newEncKeyBytes)); 
@@ -293,4 +294,54 @@ function verify(msgStr, sigb64, pkeySign) {
     var msgBytes = stringToArrayBuffer(msg); 
     var sigBytes = base64ToArrayBuffer(sigb64); 
     return crypto.subtle.verify(SIGN_ALGORITHM, pkeySign, sigBytes, msgBytes);
+}
+
+
+//this function tests all the crypto functions
+function testEverything() {
+    msg = 'ceci est un test'; 
+
+    //generate a first keyring
+    generateKeyRing().then(function(k) {
+	kr=k;
+	console.log("Keyring1: ");
+	console.log(kr);
+	return generateEncryptAndExportKeyring('expwd');
+    }).then(function(k) {
+	ekr2=k;
+	console.log("Enc Keyring2: ");
+	console.log(ekr2);
+	return importAndDecryptKeyring(ekr2, 'expwd');
+    }).then(function(k) {
+	kr2=k;
+	console.log("Keyring2: ");
+	console.log(kr2);
+	return sign(msg, kr.skeySign);
+    }).then(function(s) {
+	sgn=s;
+	console.log("Signature: ");
+	console.log(sgn);
+	return verify(msg, sgn, kr.pkeySign);
+    }).then(function(x) {
+	console.log("Verification1-ok: ");
+	console.log(x);
+	return verify(msg, sgn, kr2.pkeySign);
+    }).then(function(x) {
+	console.log("Verification2-ko: ");
+	console.log(x);
+	return encrypt(msg, kr.pkeyEncrypt);
+    }).then(function(ct) {
+	ct1 = ct;
+	console.log("encrypt:");
+	console.log(ct);
+	return reencryptSessionKey(ct.enckey, kr.skeyEncrypt, kr2.pkeyEncrypt);
+    }).then(function(enckey) {
+	ct2 = {ct: ct1.ct, enckey: enckey};
+	console.log("reencrypt:");
+	console.log(ct2);
+	return decrypt(ct2, kr2.skeyEncrypt);
+    }).then(function(text) {
+	console.log('decrypt');
+	console.log(text);
+    });
 }
