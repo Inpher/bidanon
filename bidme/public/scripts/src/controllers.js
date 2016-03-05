@@ -285,9 +285,9 @@ define(['angular'], function (angular) {
 
     ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
       vm.finProfile = {
-        score : 94 },
-        avgIncome : 9000},
-        avgSpendings : 3000},
+        score : 94 ,
+        avgIncome : 9000,
+        avgSpendings : 3000,
       };
 
       console.log("test");
