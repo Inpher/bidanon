@@ -5,73 +5,69 @@
 
 
 
-    <div class="row">
+    <div class="row" >
         <div class="col-md-10 col-md-offset-1">
-
             <div class="row">
                 <div class="col-md-12">
 
-                    <div class="row">
-                        <div class="col-md-12">
+                <div class="panel panel-success" ng-show="vm.type == 'BANK'">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading" >Available Requests</div>
 
-                            <div class="panel panel-success">
-                                <!-- Default panel contents -->
-                                <div class="panel-heading">Available Requests</div>
-
-                                <table class="table table-condensed">
-                                    <thead>
-                                    <tr>
-                                        <th class="text-center" width="30%">Score</th>
-                                        <th class="text-center" width="30%">Amount</th>
-                                        <th class="text-center" width="20%"><span class="glyphicon glyphicon-pencil"></span></th>
-                                        <th class="text-center" width="20%"><span class="glyphicon glyphicon-trash"></span></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr ng-repeat="bid in vm.bids">
-                                        <td class="text-center" ng-hide="bid.modify">{{bid.score}}</td>
-                                        <td class="text-center" ng-hide="bid.modify">{{bid.amount}}</td>
-                                        <td class="text-center" ng-hide="bid.modify">
-                                            <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,true)">
-                                                <span class="glyphicon glyphicon-pencil"></span> Bid
-                                            </button>
-                                        </td>
-                                        
-                                        <td class="text-center" ng-hide="thing.modify">
-                                            <a href="/#/bidInfo" type="button" class="btn btn-danger btn-sm">
-                                                <span class="glyphicon glyphicon-trash"></span> 
-                                            </a>
-                                            <!-- <button type="button" ng-click="vm.deleteThing($index)" class="btn btn-danger btn-sm">
-                                                <span class="glyphicon glyphicon-trash"></span> 
-                                            </button> -->
-                                        </td>
+                    <table class="table table-condensed">
+                        <thead>
+                        <tr>
+                            <th class="text-center" width="30%">Score</th>
+                            <th class="text-center" width="30%">Amount</th>
+                            <th class="text-center" width="20%"><span class="glyphicon glyphicon-pencil"></span></th>
+                            <th class="text-center" width="20%"><span class="glyphicon glyphicon-trash"></span></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="bid in vm.bids">
+                            <td class="text-center" ng-hide="bid.modify">{{bid.score}}</td>
+                            <td class="text-center" ng-hide="bid.modify">{{bid.amount}}</td>
+                            <td class="text-center" ng-hide="bid.modify">
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,true)">
+                                    <span class="glyphicon glyphicon-pencil"></span> Bid
+                                </button>
+                            </td>
+                            
+                            <td class="text-center" ng-hide="thing.modify">
+                                <a href="/#/bidInfo" type="button" class="btn btn-danger btn-sm">
+                                    <span class="glyphicon glyphicon-trash"></span> 
+                                </a>
+                                <!-- <button type="button" ng-click="vm.deleteThing($index)" class="btn btn-danger btn-sm">
+                                    <span class="glyphicon glyphicon-trash"></span> 
+                                </button> -->
+                            </td>
 
 
-                                        <td class="text-center" ng-show="bid.modify">
-                                            <input type="text" class="form-control" ng-model="bid.score" placeholder="bid.score" required>
-                                        </td>
-                                        <td class="text-center" ng-show="bid.modify">
-                                            <input type="number" class="form-control" ng-model="bid.amount" placeholder="bid.amount" required>
-                                        </td>
-                                        <td class="text-center" ng-show="bid.modify">
-                                            <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,false)">
-                                                <span class="glyphicon glyphicon-pencil"></span> Update
-                                            </button>
-                                        </td>
-                                        <td class="text-center" ng-show="bid.modify">
-                                            <button ng-disabled="true" type="button" class="btn btn-danger btn-sm">
-                                                <span class="glyphicon glyphicon-trash"></span> Delete
-                                            </button>
-                                        </td>
-                                    </tr>
+                            <td class="text-center" ng-show="bid.modify">
+                                <input type="text" class="form-control" ng-model="bid.score" placeholder="bid.score" required>
+                            </td>
+                            <td class="text-center" ng-show="bid.modify">
+                                <input type="number" class="form-control" ng-model="bid.amount" placeholder="bid.amount" required>
+                            </td>
+                            <td class="text-center" ng-show="bid.modify">
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,false)">
+                                    <span class="glyphicon glyphicon-pencil"></span> Update
+                                </button>
+                            </td>
+                            <td class="text-center" ng-show="bid.modify">
+                                <button ng-disabled="true" type="button" class="btn btn-danger btn-sm">
+                                    <span class="glyphicon glyphicon-trash"></span> Delete
+                                </button>
+                            </td>
+                        </tr>
 
-                                    </tbody>
-                                </table>
+                        </tbody>
+                    </table>
 
-                            </div>
+                </div>
 
-                        </div>
-                    </div>
+            </div>
+        </div>
 
 
 
@@ -137,10 +133,6 @@
                         </div>
                     </div> -->
 
-                    </br>
-
-                    <hr>
-
                     <div class="row">
 <!-- 
                         <div class="col-md-4">
@@ -166,11 +158,11 @@
 
                         </div> -->
 
-                        <div class="col-md-4">
+                        <div class="col-md-4" ng-show="vm.type == 'CLIENT'">
 
                             <div class="panel panel-success">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Create A Bid</h3>
+                                    <h3 class="panel-title">Create A Request</h3>
                                 </div>
                                 <div class="panel-body text-center">
                                     Here you can create bids!
