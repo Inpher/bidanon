@@ -12,16 +12,16 @@
 
                 <div class="row">
 
-                  <form ng-submit="vm.createBid()" role="form" class="form-inline">
+                  <form ng-submit="vm.createRequest()" role="form" class="form-inline">
                     <div class="col-md-10 col-md-offset-1">
 
                             <fieldset>
                                 <legend>Create new Request</legend>
                                 <div class="form-group">
-                                    <input type="number" class="form-control" ng-model="vm.bid.score" placeholder="Score of bid..." required>
+                                    <input type="number" class="form-control" ng-model="vm.request.amount" placeholder="Amount (CHF)" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="number" class="form-control" ng-model="vm.bid.amount" placeholder="Amount ..." required>
+                                    <input type="number" class="form-control" ng-model="vm.request.maturity" placeholder="Maturity" required>
                                 </div>
                                 <input type="submit" class="btn btn-primary" value="Create"/>
                             </fieldset>

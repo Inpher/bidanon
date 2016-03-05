@@ -61,9 +61,9 @@ module.exports = function(app, passport,models) {
         session: false
     }),api.getRequests);
 
-    app.post('/api/bid', showClientRequest, passport.authenticate('local-authorization', {
+    app.post('/api/request', showClientRequest, passport.authenticate('local-authorization', {
         session: false
-    }),api.createBid);
+    }),api.createRequest);
 
     app.post('/api/profile', showClientRequest, passport.authenticate('local-authorization', {
       session: false
