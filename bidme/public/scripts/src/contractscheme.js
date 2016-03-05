@@ -4,48 +4,45 @@ if (crypto && !crypto.subtle && crypto.webkitSubtle) {
 	crypto.subtle = crypto.webkitSubtle;
 }; 
 
-function generateKeys() {
-    var skeySign = null; 
-    var pkeySign = null;
-    var skeyEncrypt = null;
-    var pkeyEncrypt = null;
+var SIGN_ALGORITHM={
+		name: "RSA-PSS", 
+		modulusLength: 2048, 
+		publicExponent: new Uint8Array([0x01, 0x00, 0x01]), 
+		hash: {name: "SHA-256"}};
+var RSA_ENCRYPT_ALGORITHM={name: "RSA-OAEP", 
+		modulusLength: 2048, 
+		publicExponent: new Uint8Array([0x01, 0x00, 0x01]), 
+		hash: {name: "SHA-256"}};
+var AES_ENCRYPT_ALGORITM={name: "AES-CBC",
+		iv: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]), 
+};
 
-    var promiseKeyEncrypt = null;
-    var promiseKeySign = null;
-
-    if (crypto.subtle) {
-	console.log("Cryptography API Supported");
-	
-	//Parameters:
-	//1. Asymmetric Encryption algorithm name and its requirements
-	//2. Boolean indicating extractable. which indicates whether or not the raw keying material may be exported by the application (http://www.w3.org/TR/WebCryptoAPI/#dfn-CryptoKey-slot-extractable)
-	//3. Usage of the keys. (http://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface-types)
-	promiseKeyEncrypt = crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, false, ["encrypt", "decrypt"]);
-
-	promiseKeyEncrypt.then(function(key){
-            skeyEncrypt = key.privateKey;
-            pkeyEncrypt = key.publicKey;
+function generateKeyRing() {
+    var reps = {};
+    //skeySign = null; 
+    //var pkeySign = null;
+    //var skeyEncrypt = null;
+    //var pkeyEncrypt = null;
+    return new Promise(function (resolve, reject) {
+        crypto.subtle.generateKey(
+	    	RSA_ENCRYPT_ALGORITHM, 
+		true, 
+		["encrypt", "decrypt"])
+	.then(function(key){
+            reps.skeyEncrypt = key.privateKey;
+            reps.pkeyEncrypt = key.publicKey;
+ 	    return crypto.subtle.generateKey(
+		SIGN_ALGORITHM, 
+		true, ["sign", "verify"]);
+	}).then(function(key){
+            reps.skeySign = key.privateKey;
+            reps.pkeySign = key.publicKey;
+	    return resolve(reps);
+	}).catch(function(err) {
+	    reject(err);
 	});
-
-	promiseKeyEncrypt.catch = function(e){
-            console.log(e.message);
-	}
-
-	promiseKeySign = crypto.subtle.generateKey({name: "RSA-PSS", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, false, ["sign", "verify"]);
-
-	promiseKeySign.then(function(key){
-            skeySign = key.privateKey;
-            pkeySign = key.publicKey;
-	});
-
-	promiseKeySign.catch = function(e) {
-	    console.log(e.message)
-	}
-    }
-    else
-    {
-	alert("Cryptography API not Supported");
-    }
+    });
 }
 
 function stringToArrayBuffer(string) {
@@ -53,6 +50,15 @@ function stringToArrayBuffer(string) {
        return encoder.encode(string);
 }
 
+function arrayBufferToBase64(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
 
 function deriveKeyFromPwd(pwd) {
         // First, create a PBKDF2 "key" containing the password
@@ -80,3 +86,31 @@ function deriveKeyFromPwd(pwd) {
 }
 
 
+//input sKey, cryptoKey
+function encryptPrivateKey(sKey, pwd) {
+    var aesKey;
+    var exportedSKey; //ArrayBuffer
+
+    return new Promise(function (resolve, reject) {
+        deriveKeyFromPwd(pwd).then(function(aek) {
+	    aesKey = aek;
+	    return crypto.subtle.exportKey(
+		    "pkcs8",
+		    sKey);
+	}).then(function(expk) {
+	    exportedSKey=expk;
+	    return crypto.subtle.encrypt(
+		    AES_ENCRYPT_ALGORITM,
+		    aesKey,
+		    exportedSKey);
+	}).then(function(encK) {
+	    return resolve(arrayBufferToBase64(encK));
+	}).catch(function(err) {
+	    return reject(err);
+	});
+    });
+} 
+
+
+function decryptPrivateKey(encKey, pwd) {
+}
