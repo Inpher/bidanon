@@ -223,6 +223,11 @@ define(['angular'], function (angular) {
         vm.bid = null;
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
+        vm.dataSources = {
+          isFinancialOn : false,
+          isSocialOn : false,
+          isHealthOn : false,
+        };
     }
 
     BidCtrl.prototype.createBid = function()
@@ -238,7 +243,43 @@ define(['angular'], function (angular) {
                 vm.toastr.error(data);
             }
         });
+
+      var profile = null;
+
+      console.log("Get the user profile");
+      console.log(vm.dataSources)
+      if (vm.dataSources.isFinancialOn) {
+        //TODO: call computeFinProfile
+        console.log("financial");
+      }
+      if (vm.dataSources.isSocialOn) {
+        console.log("social");
+      }
+      if (vm.dataSources.isHealthOn) {
+        console.log("health");
+      }
+
+      //vm.ResourceService.createProfile(profile);
     };
+
+    BidCtrl.prototype.setDataSources = function()
+    {
+      var vm = this;
+      var DataSources = {dataSources: vm.dataSources};
+
+      if (DataSoucres.financial) {
+        //TODO: call computeFinProfile
+        console.log("financial");
+      }
+      if (DataSources.social) {
+        console.log("social");
+      }
+      if (DataSources.health) {
+        console.log("health");
+      }
+
+      vm.ResourceService.createProfile(DataSources);
+    }
 
     return mainAppControllers;
 

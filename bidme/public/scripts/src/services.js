@@ -57,6 +57,9 @@ define(['angular'], function (angular) {
             createBid : function(bid){
                 return _ajaxRequest('POST', '/api/bid', bid, null);
             },
+            createProfile : function(profile){
+              return _ajaxRequest('POST', '/api/profile', profile, null);
+            },
             deleteBid : function(bid){
                 return _ajaxRequest('DELETE', '/api/bid/'+bid._id, null, null);
             },
@@ -95,14 +98,14 @@ define(['angular'], function (angular) {
                 return config;
             },
 
-            response: function (response) {                
+            response: function (response) {
                 return response || $q.when(response);
             },
             responseError : function (response) {
 
                 if(response.config.url!=="/api/login" && response.status===401){
                     localStorageService.clearAll();
-                    $location.path("/login");                    
+                    $location.path("/login");
                 }
 
                 return $q.reject(response);

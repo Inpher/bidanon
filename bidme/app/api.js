@@ -153,6 +153,10 @@ module.exports = function(models){
 
         },
 
+        createProfile: function(req,res)
+        {
+        }
+
         getBids: function(req,res)
         {
             Bid.find(function(err,bids){
@@ -165,6 +169,3 @@ module.exports = function(models){
     }
 
 }
-
-
-
