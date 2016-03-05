@@ -5,13 +5,14 @@
     "angular": "*",
     "angular-mocks": "*",
     "angular-route": "*",
-    "angular-local-storage" : "*",
-    "angular-animate" : "*",
-    "angular-toastr" : "*",
+    "angular-local-storage": "*",
+    "angular-animate": "*",
+    "angular-toastr": "*",
     "jquery": "*",
     "bootstrap": "*",
-    "cryptojslib" : "*",
-    "requirejs" : "*"
+    "cryptojslib": "*",
+    "requirejs": "*",
+    "ng-file-upload": "^12.0.1"
   },
   "private": true,
   "ignore": [
