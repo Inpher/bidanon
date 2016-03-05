@@ -2,25 +2,29 @@
 <div ng-include src="'partials/header.html'"></div>
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
+    <div class="row row-centered">
+        <div class="col-md-4 col-centered">
 
-            <form class="form-inline" role="form" ng-submit="vm.signup()">
-                <fieldset>
-                    <legend>Register User</legend>
-                    <div class="form-group">
-                        <input type="text" class="form-control" ng-model="vm.username" placeholder="Type your username..." required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" ng-model="vm.password" placeholder="Type your password..." required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" ng-model="vm.check_password" placeholder="Type your password..." required>
-                    </div>
+            <div class="panel panel-success">
+                <!-- Default panel contents -->
+                <div class="panel-heading">Registration</div>
+                    <form role="form" ng-submit="vm.signup()">
+                        <fieldset>
+                            <div class="form-group">
+                                <input type="text" class="form-control" ng-model="vm.username" placeholder="Type your username..." required>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" ng-model="vm.password" placeholder="Type your password..." required>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" ng-model="vm.check_password" placeholder="Type your password..." required>
+                            </div>
 
-                    <input type="submit" class="btn btn-primary" value="Create User"/>
-                </fieldset>
-            </form>
+                            <input type="submit" class="btn btn-primary" value="Create User"/>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
 
         </div>
     </div>

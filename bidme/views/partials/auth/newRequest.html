@@ -3,39 +3,28 @@
 
 <div class="container-fluid">
 
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
+    <div class="row row-centered">
+        <div class="col-md-4 col-centered">
 
             <div class="panel panel-info">
                 <!-- Default panel contents -->
-                <div class="panel-heading">Bid</div>
-
-                <div class="row">
-
-                  <form ng-submit="vm.createRequest()" role="form" class="form-inline">
-                    <div class="col-md-10 col-md-offset-1">
-
-                            <fieldset>
-                                <legend>Create new Request</legend>
-                                <div class="form-group">
-                                    <input type="number" class="form-control" ng-model="vm.request.amount" placeholder="Amount (CHF)" required>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" class="form-control" ng-model="vm.request.maturity" placeholder="Maturity" required>
-                                </div>
-                                <input type="submit" class="btn btn-primary" value="Create"/>
-                            </fieldset>
-
-                    </div>
+                <div class="panel-heading">Request</div>                
+                  <form ng-submit="vm.createRequest()" role="form" >
+                        <fieldset>
+                            <legend>Create new Request</legend>
+                            <div class="form-group">
+                                <input type="number" class="form-control" ng-model="vm.request.amount" placeholder="Amount (CHF)" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" class="form-control" ng-model="vm.request.maturity" placeholder="Maturity" required>
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="Create"/>
+                        </fieldset>
                   </form>
-                </div>
-                <br>
-                <br>
-
-
-
             </div>
+                
         </div>
-
     </div>
+
 </div>
+

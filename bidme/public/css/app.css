@@ -3,8 +3,60 @@
 .no-bottom-margin {
     margin-bottom: 0px;
     border-radius: 0px;
+}/* centered columns styles */
+.row-centered {
+    text-align:center;
+}
+.col-centered {
+    display:inline-block;
+    float:none;
+    /* reset the text-align */
+    text-align:left;
+    /* inline-block space fix */
+    margin-right:-4px;
+}
+body {
+	font-size: 12pt;
+	font-family: font-family: "Myriad Pro", Myriad, "Liberation Sans", "Nimbus Sans L", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	text-align: center;	
+	height: 100%;
 }
 
+* {
+	border-radius: 0 !important;
+	border: none;
+}
+#navbar {
+	background-color: transparent;
+	border: none;
+	margin-bottom: 50px;
+}
+
+.panel-heading {
+	color: rgb(228, 228, 228) !important;
+	background-color: rgb(208, 122, 92) !important;
+	border: none !important;
+}
+.btn-primary {
+	color: rgb(228, 228, 228) !important;
+	background-color: rgb(208, 122, 92) !important;
+	border: none !important;
+	width:100%;
+}
+html, body {
+    height:100%;
+}
+.panel form {
+	margin: 15px;
+}
+
+body {
+	background-image: url("../css/background.png");
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+}
 .user-row {
     margin-bottom: 14px;
 }
@@ -39,6 +91,16 @@
 	margin-top:20px;
 }
 
+.special-form {
+	margin-left: 0px !important;
+	margin-right: 0px !important;
+}
+
+.special-btn{
+	padding-right: 0px !important;
+	padding-left: 0px !important;
+	margin-top: 15px;
+}
 
 
 

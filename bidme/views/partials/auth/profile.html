@@ -2,47 +2,32 @@
 <div ng-include src="'partials/header.html'"></div>
 
 <div class="container-fluid">
-
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-
-            <div class="panel panel-info">
-                <!-- Default panel contents -->
-                <div class="panel-heading">Profile Creation</div>
-
-                <div class="row">
-
-                <div class="col-md-10 col-md-offset-1">
-                  <form ng-submit="vm.createProfile()" role="form" class="form">
-                        <h2>Data Sources</h2>
-                        <p>Select which data source you wish to enable to create the profile</p>
-                        <div class="checkbox">
-                          <label><input type="checkbox" value="" ng-model="vm.dataSources.isFinancialOn">Financial data</label>
-                          <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
-                            <b>Please select exported financial data:</b>
-                            <br></br>
-                            <input type="file" ngf-select="vm.uploadFile($files)" multiple>
-                          </div>
-                        </div>
-                        <div class="checkbox">
-                          <label><input type="checkbox" value="" ng-model="vm.dataSources.isSocialOn">Social data</label>
-                        </div>
-                        <div class="checkbox disabled">
-                          <label><input type="checkbox" value="" ng-model="vm.dataSources.isHealthOn" disabled>Health data</label>
-                        </div>
-                      <br>
-                      <input type="submit" class="btn btn-primary" value="Create"/>
-                  </form>
-                </div>
-                </div>
-
-                <br>
-                <br>
-
-
-
-            </div>
-        </div>
-
-    </div>
+		<div class="row row-centered">
+				<div class="col-md-5 col-centered">
+						<div class="panel panel-info">
+								<!-- Default panel contents -->
+								<div class="panel-heading">Profile Creation</div>				
+									<form ng-submit="vm.createProfile()" role="form" class="form">
+												<h2>Data Sources</h2>
+												<p>Select which data source you wish to enable to create the profile</p>
+												<div class="checkbox">
+													<label><input type="checkbox" value="" ng-model="vm.dataSources.isFinancialOn">Financial data</label>
+													<div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
+														<b>Please select exported financial data:</b>
+														<br></br>
+														<input type="file" ngf-select="vm.uploadFile($files)" multiple>
+													</div>
+												</div>
+												<div class="checkbox">
+													<label><input type="checkbox" value="" ng-model="vm.dataSources.isSocialOn">Social data</label>
+												</div>
+												<div class="checkbox disabled">
+													<label><input type="checkbox" value="" ng-model="vm.dataSources.isHealthOn" disabled>Health data</label>
+												</div>
+											<br>
+											<input type="submit" class="btn btn-primary" value="Create"/>
+									</form>
+						</div>
+				</div>
+		</div>
 </div>
