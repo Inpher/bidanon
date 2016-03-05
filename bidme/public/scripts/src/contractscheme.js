@@ -241,8 +241,8 @@ function encrypt(jsonStr, pkeyEncrypt) {
 	}).then(function(ctBytes) {
 	    ctb64 = arrayBufferToBase64(ctBytes);
 	    return crypto.subtle.exportKey("raw", aesSessionKey);
-	}).then(function(keyStr) {
-	    aesSessionKeyBytes = stringToArrayBuffer(keyStr);
+	}).then(function(keyBytes) {
+	    aesSessionKeyBytes = keyBytes;
 	    return crypto.subtle.encrypt(RSA_ENCRYPT_ALGORITHM, pkeyEncrypt, aesSessionKeyBytes); 
 	}).then(function(encSessionKeyBytes) {
 	    return resolve({"ct": ctb64, "enckey": arrayBufferToBase64(encSessionKeyBytes)}); 
@@ -255,11 +255,11 @@ function encrypt(jsonStr, pkeyEncrypt) {
 function decrypt(ct, skeyEncrypt) {
     return new Promise(function(resolve, reject) {
 	var encAesBytes = base64ToArrayBuffer(ct["enckey"]); 
-	crypto.subtle.decrypt("RSA_ENCRYPT_ALGORITHM", skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
-	    return crypto.subtle.importKey("raw", aeskeyBytes, AES_ENCRYPT_ALGORITHM, true, ["encrypt", "decrypt"]); 
+	crypto.subtle.decrypt(RSA_ENCRYPT_ALGORITHM, skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
+	    return crypto.subtle.importKey("raw", aeskeyBytes, AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV, true, ["encrypt", "decrypt"]); 
 	}).then(function(aesKey) {
 	    var ctBytes = base64ToArrayBuffer(ct["ct"]); 
-	    return crypto.subtle.decrypt("AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV", aesKey, ctBytes);
+	    return crypto.subtle.decrypt(AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV, aesKey, ctBytes);
 	}).then(function(ptBytes) {
 	    return resolve(arrayBufferToString(ptBytes)); 
 	}).catch(function(err) { return reject(err)}); 
@@ -269,7 +269,7 @@ function decrypt(ct, skeyEncrypt) {
 function reencryptSessionKey(encAesKey, skeyEncrypt, pkeyEncryptDest) {
     return new Promise(function(resolve, reject) {
 	var encAesBytes = base64ToArrayBuffer(encAesKey);
-	crypto.subtle.decrypt("RSA_ENCRYPT_ALGORITHM", skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
+	crypto.subtle.decrypt(RSA_ENCRYPT_ALGORITHM, skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
 	    return crypto.subtle.encrypt(RSA_ENCRYPT_ALGORITHM, pkeyEncryptDest, aeskeyBytes); 
 	}).then(function(newEncKeyBytes) {
 	    return resolve(arrayBufferToBase64(newEncKeyBytes)); 
