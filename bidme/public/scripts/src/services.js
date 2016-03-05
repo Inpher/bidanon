@@ -57,8 +57,8 @@ define(['angular'], function (angular) {
             getRequests : function(refresh){
                 return _promisesGetter('GET','/api/requests', null, "requests", refresh);
             },
-            createBid : function(bid){
-                return _ajaxRequest('POST', '/api/bid', bid, null);
+            createRequest : function(request){
+                return _ajaxRequest('POST', '/api/request', request, null);
             },
             createProfile : function(profile){
               return _ajaxRequest('POST', '/api/profile', profile, null);

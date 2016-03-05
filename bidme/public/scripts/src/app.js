@@ -105,9 +105,9 @@ define([
                     controllerAs: 'vm',
                     access: { requiredLogin: true }
                 }).
-                when('/bid', {
-                    templateUrl: 'partials/auth/bid',
-                    controller: 'BidCtrl',
+                when('/request', {
+                    templateUrl: 'partials/auth/newRequest',
+                    controller: 'RequestCtrl',
                     controllerAs: 'vm',
                     access: { requiredLogin: true }
                 }).

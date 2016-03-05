@@ -7,7 +7,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('RegistrationCtrl', ['ResourceService', 'CryptoJSService', 'toastr', RegistrationCtrl]);
     mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
-    mainAppControllers.controller('BidCtrl', ['ResourceService', 'toastr', BidCtrl]);
+    mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
     mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
@@ -251,21 +251,21 @@ define(['angular'], function (angular) {
     };
 
 
-    function BidCtrl(ResourceService, toastr)
+    function RequestCtrl(ResourceService, toastr)
     {
         var vm = this;
-        vm.bid = null;
+        vm.request = null;
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
     }
 
-    BidCtrl.prototype.createBid = function()
+    RequestCtrl.prototype.createRequest = function()
     {
         var vm = this;
-        var Bid = {bid: vm.bid};
+        var Request = {request: vm.request};
 
-        vm.ResourceService.createBid(Bid).then(function(data){
-            vm.bid = null;
+        vm.ResourceService.createRequest(Request).then(function(data){
+            vm.request = null;
             vm.toastr.success(data.message);
         },function(data, status) {
             if(status!==401){
