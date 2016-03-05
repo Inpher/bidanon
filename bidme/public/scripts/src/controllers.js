@@ -299,19 +299,19 @@ define(['angular'], function (angular) {
     ProfileCtrl.prototype.createProfile = function()
     {
       var vm = this;
-      var profile = {
-        financial: null,
-        social: null,
-        health: null,
+      var Profile = {
+        profile : {
+          financial: null,
+          social: null,
+          health: null,
+        }
       };
 
       console.log("Get the user profile");
       console.log(vm.dataSources)
       if (vm.dataSources.isFinancialOn) {
-        //TODO: call computeFinProfile
         console.log("financial");
-        profile.financial = computeFinProfile();
-        console.log(profile.financial);
+        Profile.profile.financial = computeFinProfile();
       }
       if (vm.dataSources.isSocialOn) {
         console.log("social");
@@ -320,7 +320,7 @@ define(['angular'], function (angular) {
         console.log("health");
       }
 
-      //vm.ResourceService.createProfile(profile);
+      vm.ResourceService.createProfile(Profile);
     };
 
     function ComputeFinDataScoreCtrl(ResourceService, toastr)
