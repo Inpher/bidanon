@@ -7,9 +7,10 @@ module.exports = function(connection) {
     var Schema = mongoose.Schema;
 
     var userSchema = new Schema({
-        username: String,
+        username: {type: String, unique: true},
         password: String,
         email: String,
+        type:{type: String, enum:['CLIENT', 'BANK'], default: 'CLIENT'},
         token : {
             auth_token: String,
             createDate: {type: Date, required: true, default: moment()}

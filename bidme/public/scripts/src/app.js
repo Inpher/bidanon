@@ -105,6 +105,18 @@ define([
                     controllerAs: 'vm',
                     access: { requiredLogin: true }
                 }).
+                when('/pubRequest', {
+                    templateUrl: 'partials/auth/pubRequest',
+                    controller: 'RequestCtrl',
+                    controllerAs: 'vm',
+                    access: { requiredLogin: true }
+                }).
+                when('/profile', {
+                    templateUrl: 'partials/auth/profile',
+                    controller: 'ProfileCtrl',
+                    controllerAs: 'vm',
+                    access: { requiredLogin: true }
+                }).
                 otherwise({
                     redirectTo: '/login'
                 });
@@ -130,7 +142,3 @@ define([
 
 
 });
-
-
-
-

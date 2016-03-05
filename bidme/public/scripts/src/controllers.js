@@ -9,6 +9,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('BidCtrl', ['ResourceService', 'toastr', BidCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
+    mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
 
     function ProvaCtrl() {
@@ -239,6 +240,40 @@ define(['angular'], function (angular) {
                 vm.toastr.error(data);
             }
         });
+
+    };
+
+    function ProfileCtrl(ResourceService, toastr)
+    {
+        var vm = this;
+        vm.ResourceService = ResourceService;
+        vm.toastr = toastr;
+        vm.dataSources = {
+          isFinancialOn : false,
+          isSocialOn : false,
+          isHealthOn : false,
+        };
+        var profile = null;
+    }
+
+    ProfileCtrl.prototype.createProfile = function()
+    {
+      var vm = this;
+
+      console.log("Get the user profile");
+      console.log(vm.dataSources)
+      if (vm.dataSources.isFinancialOn) {
+        //TODO: call computeFinProfile
+        console.log("financial");
+      }
+      if (vm.dataSources.isSocialOn) {
+        console.log("social");
+      }
+      if (vm.dataSources.isHealthOn) {
+        console.log("health");
+      }
+
+      //vm.ResourceService.createProfile(profile);
     };
 
     function ComputeFinDataScoreCtrl(ResourceService, toastr)
