@@ -40,10 +40,12 @@ module.exports = function(models){
 
         login:function(req,res)
         {
+	    console.log(req.user);
             res.json({ 
 		auth_token: req.user.token.auth_token, 
 		type:req.user.type, 
-		"_id":req.user._id
+		"_id":req.user._id,
+		encKeyRing:req.user.encKeyRing,
 	    });
         },
 

@@ -131,30 +131,35 @@ define(['angular'], function (angular) {
 
     RegistrationCtrl.prototype.signupBank = function()
     {
-        var vm = this;
-        var salt = vm.username;
+	var vm = this;
+        if(vm.username===undefined || vm.password===undefined){
+	    return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+	}
+	if(vm.password !== vm.check_password){
+	    return vm.toastr.warning('password and check_password must be the same!');
+	}
+	//generate a keyring
+	generateEncryptAndExportKeyring(vm.password).then(function(ekr) {
+	    var salt = vm.username;
+	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+	    var user = { 
+		"username": vm.username, 
+		"password": enc_password.toString(), 
+		"type": "BANK", 
+		"encKeyRing": ekr,
+	    };
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "type": "BANK", "check_password" : enc_check_password.toString() };
-        console.log(user);
-        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
-            if(vm.password !== vm.check_password){
-                vm.toastr.warning('password and check_password must be the same!');
-            }else{
-                vm.ResourceService.signup(user).then(function(){
-                    vm.toastr.success('User successfully registered!');
-                    vm.username = null;
-                    vm.password = null;
-                    vm.check_password = null;
-                },function(data) {
-                    vm.toastr.error(data.message);
-                });
-            }
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
-        }
+	    return vm.ResourceService.signup(user);
+	}).then(function() {
+	    vm.toastr.success('User successfully registered!');
+	    vm.username = null;
+	    vm.password = null;
+	    vm.check_password = null;
+	},function(data) {
+	    console.log(data);
+	    vm.toastr.error(data.message);
+	});
     };
 
     
