@@ -13,7 +13,7 @@ var RSA_ENCRYPT_ALGORITHM={name: "RSA-OAEP",
 		modulusLength: 2048, 
 		publicExponent: new Uint8Array([0x01, 0x00, 0x01]), 
 		hash: {name: "SHA-256"}};
-var AES_ENCRYPT_ALGORITM={name: "AES-CBC",
+var AES_ENCRYPT_ALGORITHM={name: "AES-CBC",
 		iv: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]), 
 };
@@ -60,6 +60,16 @@ function arrayBufferToBase64(buffer) {
     return window.btoa( binary );
 }
 
+function base64ToArrayBuffer(base64) {
+    var binary_string =  window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array( len );
+    for (var i = 0; i < len; i++)        {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
 function deriveKeyFromPwd(pwd) {
         // First, create a PBKDF2 "key" containing the password
         return crypto.subtle.importKey(
@@ -100,7 +110,7 @@ function encryptPrivateKey(sKey, pwd) {
 	}).then(function(expk) {
 	    exportedSKey=expk;
 	    return crypto.subtle.encrypt(
-		    AES_ENCRYPT_ALGORITM,
+		    AES_ENCRYPT_ALGORITHM,
 		    aesKey,
 		    exportedSKey);
 	}).then(function(encK) {
@@ -111,6 +121,27 @@ function encryptPrivateKey(sKey, pwd) {
     });
 } 
 
+//input encKey (base64, PKCS8), pwd
+function decryptPrivateKey(encKey, pwd, algo, usage) {
+    var encKeyBuf = base64ToArrayBuffer(encKey);
+    var aesKey; 
+    return deriveKeyFromPwd(pwd).then(function(aek) {
+	aesKey = aek;
+	return crypto.subtle.decrypt(AES_ENCRYPT_ALGORITHM, aesKey, encKeyBuf)
+    }).then(function(skeyBytes) {
+	return crypto.subtle.importKey("pkcs8", skeyBytes, algo, true, usage);
+    });
+}
 
-function decryptPrivateKey(encKey, pwd) {
+function test() {
+    generateKeyRing().then(function(kr) {
+	crypto.subtle.exportKey("pkcs8", kr.skeyEncrypt).then(function(skeyStr) { console.log(arrayBufferToBase64(skeyStr)); }); 
+	encryptPrivateKey(kr.skeyEncrypt, "pwd").then(function(encSkey) {
+	    return decryptPrivateKey(encSkey, "pwd", RSA_ENCRYPT_ALGORITHM, ["decrypt"]);
+	}).then(function(decSkey) {
+	    return crypto.subtle.exportKey("pkcs8", decSkey);
+	}).then(function(skeyStr2) {
+	    console.log(arrayBufferToBase64(skeyStr2));
+	});
+    });
 }
