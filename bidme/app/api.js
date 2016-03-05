@@ -157,7 +157,7 @@ module.exports = function(models){
 
         createProfile: function(req,res)
         {
-        }
+        },
 
         getBids: function(req,res)
         {
