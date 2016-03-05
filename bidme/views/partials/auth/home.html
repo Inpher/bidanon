@@ -1,0 +1,232 @@
+<div ng-include src="'partials/nav.html'"></div>
+<div ng-include src="'partials/header.html'"></div>
+
+<div class="container-fluid">
+
+
+
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="panel panel-success">
+                                <!-- Default panel contents -->
+                                <div class="panel-heading">Available Bids</div>
+
+                                <table class="table table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center" width="30%">Score</th>
+                                        <th class="text-center" width="30%">Amount</th>
+                                        <th class="text-center" width="20%"><span class="glyphicon glyphicon-pencil"></span></th>
+                                        <th class="text-center" width="20%"><span class="glyphicon glyphicon-trash"></span></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="bid in vm.bids">
+                                        <td class="text-center" ng-hide="bid.modify">{{bid.score}}</td>
+                                        <td class="text-center" ng-hide="bid.modify">{{bid.amount}}</td>
+                                        <td class="text-center" ng-hide="bid.modify">
+                                            <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,true)">
+                                                <span class="glyphicon glyphicon-pencil"></span> Bid
+                                            </button>
+                                        </td>
+                                        
+                                        <td class="text-center" ng-hide="thing.modify">
+                                            <a href="/#/bidInfo" type="button" class="btn btn-danger btn-sm">
+                                                <span class="glyphicon glyphicon-trash"></span> 
+                                            </a>
+                                            <!-- <button type="button" ng-click="vm.deleteThing($index)" class="btn btn-danger btn-sm">
+                                                <span class="glyphicon glyphicon-trash"></span> 
+                                            </button> -->
+                                        </td>
+
+
+                                        <td class="text-center" ng-show="bid.modify">
+                                            <input type="text" class="form-control" ng-model="bid.score" placeholder="bid.score" required>
+                                        </td>
+                                        <td class="text-center" ng-show="bid.modify">
+                                            <input type="number" class="form-control" ng-model="bid.amount" placeholder="bid.amount" required>
+                                        </td>
+                                        <td class="text-center" ng-show="bid.modify">
+                                            <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,false)">
+                                                <span class="glyphicon glyphicon-pencil"></span> Update
+                                            </button>
+                                        </td>
+                                        <td class="text-center" ng-show="bid.modify">
+                                            <button ng-disabled="true" type="button" class="btn btn-danger btn-sm">
+                                                <span class="glyphicon glyphicon-trash"></span> Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                   <!--  <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="panel panel-success">
+                                <!-- Default panel contents -->
+                                <!-- 
+                                <div class="panel-heading">People</div>
+
+                                <table class="table table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center" width="30%">Name</th>
+                                        <th class="text-center" width="30%">Age</th>
+                                        <th class="text-center" width="20%"><span class="glyphicon glyphicon-pencil"></span></th>
+                                        <th class="text-center" width="20%"><span class="glyphicon glyphicon-trash"></span></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    <tr ng-repeat="person in vm.people">
+
+                                        <td class="text-center" ng-hide="person.modify">{{person.name}}</td>
+                                        <td class="text-center" ng-hide="person.modify">{{person.age}}</td>
+                                        <td class="text-center" ng-hide="person.modify">
+                                            <button type="button" ng-click="vm.updatePerson($index,true)" class="btn btn-primary btn-sm">
+                                                <span class="glyphicon glyphicon-pencil"></span> Modify
+                                            </button>
+                                        </td>
+                                        <td class="text-center" ng-hide="person.modify">
+                                            <button type="button" ng-click="vm.deletePerson($index)" class="btn btn-danger btn-sm">
+                                                <span class="glyphicon glyphicon-trash"></span> Delete
+                                            </button>
+                                        </td>
+
+                                        <td class="text-center" ng-show="person.modify">
+                                            <input type="text" class="form-control" ng-model="person.name" placeholder="person.name" required>
+                                        </td>
+                                        <td class="text-center" ng-show="person.modify">
+                                            <input type="number" class="form-control" ng-model="person.age" placeholder="person.age" required>
+                                        </td>
+                                        <td class="text-center" ng-show="person.modify">
+                                            <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updatePerson($index,false)">
+                                                <span class="glyphicon glyphicon-pencil"></span> Update
+                                            </button>
+                                        </td>
+                                        <td class="text-center" ng-show="person.modify">
+                                            <button ng-disabled="true" type="button" class="btn btn-danger btn-sm">
+                                                <span class="glyphicon glyphicon-trash"></span> Delete
+                                            </button>
+                                        </td>
+
+                                    </tr>
+
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                        </div>
+                    </div> -->
+
+                    </br>
+
+                    <hr>
+
+                    <div class="row">
+<!-- 
+                        <div class="col-md-4">
+
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Add Person</h3>
+                                </div>
+                                <div class="panel-body text-center">
+                                    Here you can add Person!
+                                    </br></br>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a href="/#person" class="btn btn-default btn-lg">
+                                                <span class="glyphicon glyphicon-book"></span>  Add!
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div> -->
+
+                        <div class="col-md-4">
+
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Create A Bid</h3>
+                                </div>
+                                <div class="panel-body text-center">
+                                    Here you can create bids!
+                                    </br></br>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a href="/#bid" class="btn btn-default btn-lg">
+                                                <span class="glyphicon glyphicon-bookmark"></span> Create!
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+<!-- 
+                        <div class="col-md-4">
+
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Join Set</h3>
+                                </div>
+                                <div class="panel-body text-center">
+                                    Here you can join existing set!
+                                    </br></br>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a href="" type="button" class="btn btn-default btn-lg">
+                                                <span class="glyphicon glyphicon-arrow-right"></span> Join!
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+
+                    </div>
+
+
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <hr/>
+    <div>Angular seed app: v<span app-version="app-version"></span></div>
+
+</div>
+
+
+
+
+
+
+
