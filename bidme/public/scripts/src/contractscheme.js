@@ -272,7 +272,7 @@ function sign(jsonStr, skeySign) {
     var msgBytes = stringToByteArray(jsonStr);
     var sigb64; 
     return new Promise(function(resolve, reject) {
-	crypto.subtle.sign(RSA_SIGN_ALGORITHM, skeySign, msgBytes).then(function(sigBytes) {
+	crypto.subtle.sign(SIGN_ALGORITHM, skeySign, msgBytes).then(function(sigBytes) {
 	    return resolve(byteArrayToBase64(sigBytes)); 
 	}).catch(function (err) {
 	    return reject(err);
@@ -283,5 +283,5 @@ function sign(jsonStr, skeySign) {
 function verify(msgStr, sigb64, pkeySign) {
     var msgBytes = stringToByteArray(msg); 
     var sigBytes = base64ToByteArray(sigb64); 
-    return crypto.subtle.verify(RSA_SIGN_ALGORITHM, pkeySign, sigBytes, msgBytes);
+    return crypto.subtle.verify(SIGN_ALGORITHM, pkeySign, sigBytes, msgBytes);
 }
