@@ -210,7 +210,7 @@ function importAndDecryptKeyring(encKRing, pwd) {
 		    //import the Sign private key  
 		    return decryptPrivateKey(encKRing.skeySign,pwd,SIGN_ALGORITHM,['sign']);
 		}).then(function(crk) {
-		    keyRing.pkeySign = crk;
+		    keyRing.skeySign = crk;
 		    return resolve(keyRing);
 		}).catch(function(err) {
 		    return reject(err);
