@@ -161,9 +161,9 @@ module.exports = function(models){
 
         },
 
-	computeFindata: function(req,res)
-	{
-	}
+    	// computeFindata: function(req,res)
+    	// {
+    	// }
     }
 
 }

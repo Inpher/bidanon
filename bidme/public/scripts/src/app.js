@@ -95,9 +95,9 @@ define([
                 }).
                 when('/computeFindata', {
                     templateUrl: 'partials/auth/computeFindata',
-                    controller: 'computeFinDataScoreCtrl',
+                    controller: 'ComputeFinDataScoreCtrl',
                     controllerAs: 'vm',
-                    access: { requiredLogin: false }
+                    access: { requiredLogin: true }
                 }).
                 when('/bid', {
                     templateUrl: 'partials/auth/bid',
