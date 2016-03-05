@@ -10,7 +10,7 @@ module.exports = function(connection) {
         username: {type: String, unique: true},
         password: String,
         email: String,
-        type:{type: String, enum:['CLIENT', 'BANK'], default: 'CLIENT'},
+        type:{type: String, enum:['CLIENT', 'BANK']},
         token : {
             auth_token: String,
             createDate: {type: Date, required: true, default: moment()}

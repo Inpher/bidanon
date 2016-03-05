@@ -3,6 +3,7 @@ module.exports = function(models){
     var User = models.user;
     var Person = models.person;
     var Bid = models.bid;
+    var Request = models.request;
 
     return {
 
@@ -10,7 +11,7 @@ module.exports = function(models){
         {
 
             var body = req.body;
-
+            console.log(body);
             User.findOne({ username: body.username
             },function(err, user) {
                 if (err)
@@ -19,7 +20,8 @@ module.exports = function(models){
                 if (user) {
                     res.send(403, {'message': 'User already exist!'});
                 }else {
-                    var newUser = new User({ username: body.username,email: body.email, password:body.password})
+                    var newUser = new User({ username: body.username, email: body.email, type: body.type, password:body.password});
+                    console.log(newUser);
                     newUser.save(function (err, user) {
                         if (err){
                             res.send(500, {'message': err});
@@ -32,7 +34,7 @@ module.exports = function(models){
 
         login:function(req,res)
         {
-            res.json({ auth_token: req.user.token.auth_token});
+            res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id});
         },
 
         logout: function(req,res)
@@ -164,10 +166,19 @@ module.exports = function(models){
             });
 
         },
+        getRequests: function(req,res)
+        {
+            Request.find(function(err,requests){
+                res.json({requests: requests });
+            });
 
-    	// computeFindata: function(req,res)
-    	// {
-    	// }
+        },
+        getBidsPerUser: function (req,res) {
+            var _id = req.params.uid;
+            Bid.find({ "u_id":  _id},function(err,bids){
+                res.json({bids: bids });
+            });
+        }
     }
 
 }

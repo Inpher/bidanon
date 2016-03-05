@@ -5,10 +5,11 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('NavCtrl', ['$location', 'localStorageService', 'AuthenticationService', NavCtrl]);
     mainAppControllers.controller('LoginCtrl', ['$location', 'ResourceService' ,'CryptoJSService', 'localStorageService', 'toastr' ,LoginCtrl]);
     mainAppControllers.controller('RegistrationCtrl', ['ResourceService', 'CryptoJSService', 'toastr', RegistrationCtrl]);
-    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data', 'toastr', HomeCtrl]);
+    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('BidCtrl', ['ResourceService', 'toastr', BidCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
+    mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
 
     function ProvaCtrl() {
@@ -64,6 +65,8 @@ define(['angular'], function (angular) {
 
             vm.ResourceService.login(user).then(function(data){
                 vm.localStorageService.set("auth_token",data.auth_token);
+                vm.localStorageService.set("type", data.type);
+                vm.localStorageService.set("u_id", data._id);
                 vm.$location.path("/home");
             },function(data, status) {
                 if(status===401){
@@ -114,15 +117,44 @@ define(['angular'], function (angular) {
         }
     };
 
+    RegistrationCtrl.prototype.signupBank = function()
+    {
+        var vm = this;
+        var salt = vm.username;
 
-    function HomeCtrl(ResourceService, data, toastr)
+        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
+        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+
+        var user = {"username": vm.username, "password": enc_password.toString(), "type": "BANK", "check_password" : enc_check_password.toString() };
+        console.log(user);
+        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
+            if(vm.password !== vm.check_password){
+                vm.toastr.warning('password and check_password must be the same!');
+            }else{
+                vm.ResourceService.signup(user).then(function(){
+                    vm.toastr.success('User successfully registered!');
+                    vm.username = null;
+                    vm.password = null;
+                    vm.check_password = null;
+                },function(data) {
+                    vm.toastr.error(data.message);
+                });
+            }
+        }else{
+            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+        }
+    };
+
+
+    function HomeCtrl(ResourceService, data, localStorageService,toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
         vm.data = data;
         vm.toastr = toastr;
+        vm.type = localStorageService.get('type');
 
-        vm.people = data[0].people;
+        vm.request = data[0].requests;
         vm.bids = data[1].bids;
     }
 
@@ -130,6 +162,7 @@ define(['angular'], function (angular) {
     {
         var vm = this;
         var person = vm.people[index];
+
 
         if(modify){
             vm.people[index].modify=true;
@@ -224,11 +257,6 @@ define(['angular'], function (angular) {
         vm.bid = null;
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
-        vm.dataSources = {
-          isFinancialOn : false,
-          isSocialOn : false,
-          isHealthOn : false,
-        };
     }
 
     BidCtrl.prototype.createBid = function()
@@ -245,7 +273,24 @@ define(['angular'], function (angular) {
             }
         });
 
-      var profile = null;
+    };
+
+    function ProfileCtrl(ResourceService, toastr)
+    {
+        var vm = this;
+        vm.ResourceService = ResourceService;
+        vm.toastr = toastr;
+        vm.dataSources = {
+          isFinancialOn : false,
+          isSocialOn : false,
+          isHealthOn : false,
+        };
+        var profile = null;
+    }
+
+    ProfileCtrl.prototype.createProfile = function()
+    {
+      var vm = this;
 
       console.log("Get the user profile");
       console.log(vm.dataSources)
@@ -267,7 +312,33 @@ define(['angular'], function (angular) {
     {
 	   var vm = this;
 	   vm.hello='HelloWorld';
+
     }
+
+    ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
+      vm.finProfile = {
+        score : 94 ,
+        avgIncome : 9000,
+        avgSpendings : 3000,
+      };
+
+      console.log("test");
+      var vm = this;
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+       var text = reader.result;
+      }
+
+      for (var i = 0; i < files.files.length; i++) {
+        var file = files.files[i];
+        reader.readAsText(file);
+        console.log(file);
+        console.log(reader);
+      }
+    }
+
+
 
     return mainAppControllers;
 
