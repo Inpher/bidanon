@@ -53,14 +53,14 @@ module.exports = function(models){
                 "_id":req.user._id,
                 "profile_id":profile._id,
                 encKeyRing:req.user.encKeyRing});
+            } else {
+              return res.json({
+                auth_token: req.user.token.auth_token,
+                type:req.user.type,
+                "_id":req.user._id,
+                encKeyRing:req.user.encKeyRing
+              });
               }
-            });
-            console.log(req.user);
-            return res.json({
-              auth_token: req.user.token.auth_token,
-              type:req.user.type,
-              "_id":req.user._id,
-              encKeyRing:req.user.encKeyRing
             });
           },
 
@@ -201,17 +201,15 @@ module.exports = function(models){
             score : profile.financial.score,
             u_id : req.user.id,
           })
-          PublicProfile.remove({ "u_id": _id }, function(err, profile) {
-            PublicProfile.update(
-              { "u_id": _id },
-              newProfile,
-              {upsert:true},
-              function (err, profile) {
-                if (err) {
-                  res.send(500, {'message': err});
-                }
-                res.json({ 'message': 'Profile was successfully created'});
-            });
+          PublicProfile.update(
+            { "u_id": _id },
+            newProfile,
+            {upsert:true},
+            function (err, profile) {
+              if (err) {
+                res.send(500, {'message': err});
+              }
+              res.json({ 'message': 'Profile was successfully created'});
           });
           //newProfile.save(function (err, profile) {
           //  if (err) {
