@@ -8,6 +8,10 @@ var promiseKeySign = null;
 
 var crypto = window.crypto || window.msCrypto;
 
+if (crypto && !crypto.subtle && crypto.webkitSubtle) {
+    crypto.subtle = crypto.webkitSubtle;
+}
+
 if (crypto.subtle) {
     console.log("Cryptography API Supported");
     
