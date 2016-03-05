@@ -9,7 +9,7 @@ var promiseKeySign = null;
 var crypto = window.crypto || window.msCrypto;
 
 if (crypto.subtle) {
-    alert("Cryptography API Supported");
+    console.log("Cryptography API Supported");
     
     //Parameters:
     //1. Asymmetric Encryption algorithm name and its requirements
@@ -26,7 +26,7 @@ if (crypto.subtle) {
         console.log(e.message);
     }
 
-    promiseKeySign = crypto.subtle.generateKey({name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, false, ["sign", "verify"]);
+    promiseKeySign = crypto.subtle.generateKey({name: "RSA-PSS", modulusLength: 2048, publicExponent: new Uint8Array([0x01, 0x00, 0x01]), hash: {name: "SHA-256"}}, false, ["sign", "verify"]);
 
      promiseKeySign.then(function(key){
         skeySign = key.privateKey;
@@ -34,7 +34,7 @@ if (crypto.subtle) {
     });
 
     promiseKeySign.catch = function(e) {
-	console.log(e.message); 
+	console.log(e.message)
     }
 }
 else
