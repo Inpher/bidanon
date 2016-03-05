@@ -76,13 +76,19 @@ define([
                     controllerAs: 'vm',
                     access: { requiredLogin: false }
                 }).
+                when('/registerBank', {
+                    templateUrl: 'partials/registerBank',
+                    controller: 'RegistrationCtrl',
+                    controllerAs: 'vm',
+                    access: { requiredLogin: false }
+                }).
                 when('/home', {
                     templateUrl: 'partials/auth/home',
                     controller: 'HomeCtrl',
                     controllerAs: 'vm',
                     resolve: {
-                        data : function(Resolver,ResourceService){
-                            return Resolver([ResourceService.getPeople(true),ResourceService.getBids(true)])
+                        data : function(Resolver,ResourceService, localStorageService){
+                            return Resolver([ResourceService.getRequests(true),ResourceService.getBids(true,localStorageService.get("u_id"))])
                         }
                     },
                     access: { requiredLogin: true }

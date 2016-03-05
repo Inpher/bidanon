@@ -5,7 +5,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('NavCtrl', ['$location', 'localStorageService', 'AuthenticationService', NavCtrl]);
     mainAppControllers.controller('LoginCtrl', ['$location', 'ResourceService' ,'CryptoJSService', 'localStorageService', 'toastr' ,LoginCtrl]);
     mainAppControllers.controller('RegistrationCtrl', ['ResourceService', 'CryptoJSService', 'toastr', RegistrationCtrl]);
-    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data', 'toastr', HomeCtrl]);
+    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('BidCtrl', ['ResourceService', 'toastr', BidCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
@@ -65,6 +65,8 @@ define(['angular'], function (angular) {
 
             vm.ResourceService.login(user).then(function(data){
                 vm.localStorageService.set("auth_token",data.auth_token);
+                vm.localStorageService.set("type", data.type);
+                vm.localStorageService.set("u_id", data._id);
                 vm.$location.path("/home");
             },function(data, status) {
                 if(status===401){
@@ -115,15 +117,44 @@ define(['angular'], function (angular) {
         }
     };
 
+    RegistrationCtrl.prototype.signupBank = function()
+    {
+        var vm = this;
+        var salt = vm.username;
 
-    function HomeCtrl(ResourceService, data, toastr)
+        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
+        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+
+        var user = {"username": vm.username, "password": enc_password.toString(), "type": "BANK", "check_password" : enc_check_password.toString() };
+        console.log(user);
+        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
+            if(vm.password !== vm.check_password){
+                vm.toastr.warning('password and check_password must be the same!');
+            }else{
+                vm.ResourceService.signup(user).then(function(){
+                    vm.toastr.success('User successfully registered!');
+                    vm.username = null;
+                    vm.password = null;
+                    vm.check_password = null;
+                },function(data) {
+                    vm.toastr.error(data.message);
+                });
+            }
+        }else{
+            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+        }
+    };
+
+
+    function HomeCtrl(ResourceService, data, localStorageService,toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
         vm.data = data;
         vm.toastr = toastr;
+        vm.type = localStorageService.get('type');
 
-        vm.people = data[0].people;
+        vm.request = data[0].requests;
         vm.bids = data[1].bids;
     }
 
@@ -131,6 +162,7 @@ define(['angular'], function (angular) {
     {
         var vm = this;
         var person = vm.people[index];
+
 
         if(modify){
             vm.people[index].modify=true;
