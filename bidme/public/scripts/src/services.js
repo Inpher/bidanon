@@ -37,6 +37,9 @@ define(['angular'], function (angular) {
             var deferred = $q.defer();
             $http({method: method, url: URL, data:data}).
                 success(function(data) {
+                    if(data.profile){
+                        data[0] = data.profile;
+                    }
                     deferred.resolve(data);
                     if(URL==="GET") _genericCallback(key,data);
                 }).

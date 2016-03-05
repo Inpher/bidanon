@@ -167,7 +167,7 @@ define(['angular'], function (angular) {
             }
         });
     };
-    
+
     function HomeCtrl($location, ResourceService, data, localStorageService,toastr)
     {
         var vm = this;
@@ -253,7 +253,8 @@ define(['angular'], function (angular) {
     HomeCtrl.prototype.showProfile = function(request)
     {
         var vm = this;
-        vm.$location.path('/profile');
+        var id = request._id;
+        vm.$location.path('/infoRequest/' + id);
     }
 
     function PersonCtrl(ResourceService, toastr) {

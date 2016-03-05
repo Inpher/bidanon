@@ -117,7 +117,7 @@ define([
                     controllerAs: 'vm',
                     resolve: {
                         data : function(Resolver,ResourceService, $route){
-                            return Resolver(ResourceService.getInfoRequest($route.current.params.id));
+                            return Resolver([ResourceService.getInfoRequest($route.current.params.id)]);
                         }
                     },
                     access: { requiredLogin: true }
