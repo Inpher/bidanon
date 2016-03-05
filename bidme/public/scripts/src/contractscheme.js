@@ -295,3 +295,53 @@ function verify(msgStr, sigb64, pkeySign) {
     var sigBytes = base64ToArrayBuffer(sigb64); 
     return crypto.subtle.verify(SIGN_ALGORITHM, pkeySign, sigBytes, msgBytes);
 }
+
+
+//this function tests all the crypto functions
+function testEverything() {
+    msg = 'ceci est un test'; 
+
+    //generate a first keyring
+    generateKeyRing().then(function(k) {
+	kr=k;
+	console.log("Keyring1: ");
+	console.log(kr);
+	return generateEncryptAndExportKeyring('expwd');
+    }).then(function(k) {
+	ekr2=k;
+	console.log("Enc Keyring2: ");
+	console.log(ekr2);
+	return importAndDecryptKeyring(ekr2, 'expwd');
+    }).then(function(k) {
+	kr2=k;
+	console.log("Keyring2: ");
+	console.log(kr2);
+	return sign(msg, kr.skeySign);
+    }).then(function(s) {
+	sgn=s;
+	console.log("Signature: ");
+	console.log(sgn);
+	return verify(msg, sgn, kr.pkeySign);
+    }).then(function(x) {
+	console.log("Verification1-ok: ");
+	console.log(x);
+	return verify(msg, sgn, kr2.pkeySign);
+    }).then(function(x) {
+	console.log("Verification2-ko: ");
+	console.log(x);
+	return encrypt(msg, kr.pkeyEncrypt);
+    }).then(function(ct) {
+	ct1 = ct;
+	console.log("encrypt:");
+	console.log(ct);
+	return reencryptSessionKey(ct.enckey, kr.skeyEncrypt, kr2.pkeyEncrypt);
+    }).then(function(enckey) {
+	ct2 = {ct: ct1.ct, enckey: enckey};
+	console.log("reencrypt:");
+	console.log(ct2);
+	return decrypt(ct2, kr2.skeyEncrypt);
+    }).then(function(text) {
+	console.log('decrypt');
+	console.log(text);
+    });
+}
