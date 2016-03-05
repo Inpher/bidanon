@@ -48,24 +48,35 @@ function generateKeys() {
     }
 }
 
+function stringToArrayBuffer(string) {
+       var encoder = new TextEncoder("utf-8");
+       return encoder.encode(string);
+}
+
+
 function deriveKeyFromPwd(pwd) {
-    return crypto.subtle.deriveKey(
-		{ "name": 'PBKDF2',
-		  "salt": "",
-		  "iterations": 100,
-		  "hash": 'SHA-256'
-		},
-		pwd,
-		// Note: for this demo we don't actually need a cipher suite,
-		// but the api requires that it must be specified.
-		// For AES the length required to be 128 or 256 bits (not bytes)
-		{ "name": 'AES-CBC', "length": 256 },
-		// Whether or not the key is extractable (less secure) or not (more secure)
-		// when false, the key can only be passed as a web crypto object, not inspected
-		true,
-		// this web crypto object will only be allowed for these functions
-		[ "encrypt", "decrypt" ]
-	    ); 
+        // First, create a PBKDF2 "key" containing the password
+        return crypto.subtle.importKey(
+            "raw",
+            stringToArrayBuffer(pwd),
+            {"name": "PBKDF2"},
+            false,
+            ["deriveKey"]).
+        // Derive a key from the password
+        then(function(baseKey){
+            return crypto.subtle.deriveKey(
+                {
+                    "name": "PBKDF2",
+                    "salt": stringToArrayBuffer(''),
+                    "iterations": 100,
+                    "hash": 'SHA-256'
+                },
+                baseKey,
+                {"name": "AES-CBC", "length": 256}, // Key we want
+                true,                               // Extrable
+                ["encrypt", "decrypt"]              // For new key
+                );
+        });
 }
 
 
