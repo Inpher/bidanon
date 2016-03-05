@@ -73,7 +73,9 @@ define(['angular'], function (angular) {
 		return encryptAndExportKeyring(kr, '');
 	    }).then(function(eekr) {
 		sessionStorage.setItem('keyRing',JSON.stringify(eekr));
-		vm.$location.path("/home");
+		console.log("Welcome! Keyring stored in the sessionStorage");
+		window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
+		return vm.$location.path("/home");
 	    }).catch(function(err) {
 		console.log(err);
 		vm.$location.path("/home");
