@@ -4,6 +4,7 @@ module.exports = function(models){
     var Person = models.person;
     var Bid = models.bid;
     var Request = models.request;
+    var PublicProfile = models.publicProfile;
 
     return {
 
@@ -103,25 +104,30 @@ module.exports = function(models){
 
 
         },
-        createBid: function(req,res)
+        createRequest: function(req,res)
         {
 
             console.log(req.body);
-            var bid = req.body.bid;
+            var request = req.body.request;
+            var _id = req.user.id;
 
-            if (typeof bid.score != "number") {
-                res.send(400, {'message': "Score must be a number!"});
-            }
-            if (typeof bid.amount != "number") {
+            if (typeof request.amount != "number") {
                 res.send(400, {'message': "Amount must be a number!"});
             }
+            if (typeof request.maturity != "number") {
+                res.send(400, {'message': "Maturity must be a number!"});
+            }
 
-            var newBid = new Bid({ score: bid.score, amount: bid.amount})
-            newBid.save(function (err, bid) {
+            var newRequest = new Request({
+              amount: request.amount,
+              maturity: request.maturity,
+              u_id: _id,
+            })
+            newRequest.save(function (err, bid) {
                 if (err){
                     res.send(500, {'message': err});
                 }
-                res.json({ 'message': 'Bid was successfully created!'});
+                res.json({ 'message': 'Request was successfully created!'});
             });
 
         },
@@ -157,6 +163,24 @@ module.exports = function(models){
 
         createProfile: function(req,res)
         {
+          var _id = req.user.id;
+          console.log(req)
+          var profile = req.body.profile;
+          var query = { _id: _id };
+          var newProfile = new PublicProfile({
+            name: "James",
+            avgMonthlyIncome : profile.financial.avgIncome,
+            avgMonthlySpendings : profile.financial.avgSpendings,
+            desc : "hello world I am cool",
+            score : profile.financial.score,
+            u_id : req.user.id,
+          })
+          newProfile.save(function (err, profile) {
+            if (err) {
+              res.send(500, {'message': err});
+            }
+            res.json({ 'message': 'Profile was successfully created'});
+          })
         },
 
         getBids: function(req,res)
