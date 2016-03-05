@@ -60,16 +60,11 @@ module.exports = function(app, passport,models) {
     app.delete('/api/bid/:id', showClientRequest, passport.authenticate('local-authorization', {
         session: false
     }),api.removeBid);
-    app.get('/api/bidInfo/:id')
+    // app.get('/api/bidInfo/:id')
 
-
-
-
-
-
-
-
-
+    // app.get('/api/bidInfo/:id', showClientRequest, passport.authenticate('local-authorization', {
+    //     session:false
+    // }),api.bidInfo);
 
     function showClientRequest(req, res, next) {
         var request = {
