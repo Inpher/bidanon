@@ -1,23 +1,24 @@
 {
-	"name": "application-name",
-	"version": "0.0.1",
-	"private": true,
-    "main" : "views/index.html",
-	"dependencies": {
-        "express": "~3.2.6",
-        "ejs": "~0.7.1",
-        "mongoose" : "*",
-        "mongoose-q":"*",
-        "passport" : "*",
-        "passport-local" : "*",
-        "passport-http-bearer" : "*",
-        "moment": "*",
-        "connect-flash" : "*",
-        "requirejs" : "*",
-        "node-uuid" : "*",
-        "grunt": "*",
-        "grunt-npm-install" : "*",
-        "grunt-bower-installer" : "*",
-        "grunt-contrib-requirejs" : "*"
-	}
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "main": "views/index.html",
+  "dependencies": {
+    "connect-flash": "*",
+    "ejs": "~0.7.1",
+    "express": "~3.2.6",
+    "grunt": "*",
+    "grunt-bower-installer": "*",
+    "grunt-contrib-requirejs": "*",
+    "grunt-npm-install": "*",
+    "moment": "*",
+    "mongoose": "*",
+    "mongoose-q": "*",
+    "multer": "^1.1.0",
+    "node-uuid": "*",
+    "passport": "*",
+    "passport-http-bearer": "*",
+    "passport-local": "*",
+    "requirejs": "*"
+  }
 }

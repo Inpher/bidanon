@@ -1,5 +1,8 @@
 <div ng-include src="'partials/nav.html'"></div>
 <div ng-include src="'partials/header.html'"></div>
 <div>
+<b>Please select exported financial data:</b>
+<br></br>
 {{vm.hello}}
+<input type="file" ngf-select="vm.uploadFile($files)" multiple>
 </div>

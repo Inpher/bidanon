@@ -245,7 +245,33 @@ define(['angular'], function (angular) {
     {
 	   var vm = this;
 	   vm.hello='HelloWorld';
+
     }
+
+    ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
+      vm.finScore = { score : 94 };
+      vm.avgIncome = { income : 9000};
+      vm.avgSpendings = { spendings : 3000};
+      console.log("test");
+      var vm = this;
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+       var text = reader.result;
+      }
+
+      for (var i = 0; i < files.files.length; i++) {
+        var file = files.files[i];
+        reader.readAsText(file);
+        console.log(file);
+        console.log(reader);
+
+        vm.finScore = { score : 94 };
+
+      }
+    }
+
+
 
     return mainAppControllers;
 
