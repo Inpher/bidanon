@@ -253,18 +253,33 @@ define(['angular'], function (angular) {
           isSocialOn : false,
           isHealthOn : false,
         };
-        var profile = null;
+    }
+
+    function computeFinProfile()
+    {
+      return {
+        score: 82,
+        avgIncome: 9000,
+        avgSpendings: 2000,
+      };
     }
 
     ProfileCtrl.prototype.createProfile = function()
     {
       var vm = this;
+      var profile = {
+        financial: null,
+        social: null,
+        health: null,
+      };
 
       console.log("Get the user profile");
       console.log(vm.dataSources)
       if (vm.dataSources.isFinancialOn) {
         //TODO: call computeFinProfile
         console.log("financial");
+        profile.financial = computeFinProfile();
+        console.log(profile.financial);
       }
       if (vm.dataSources.isSocialOn) {
         console.log("social");
@@ -280,12 +295,16 @@ define(['angular'], function (angular) {
     {
 	   var vm = this;
 	   vm.hello='HelloWorld';
-
+      vm.finProfile = {
+        score : 94,
+        avgIncome : 9000,
+        avgSpendings : 3000,
+      };
     }
 
     ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
       vm.finProfile = {
-        score : 94 ,
+        score : 94,
         avgIncome : 9000,
         avgSpendings : 3000,
       };
