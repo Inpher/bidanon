@@ -15,8 +15,10 @@ var RSA_ENCRYPT_ALGORITHM={name: "RSA-OAEP",
 		hash: {name: "SHA-256"}};
 var AES_ENCRYPT_ALGORITHM={name: "AES-CBC",
 		iv: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]), 
-};
+				    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])};
+
+var AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV={name: "AES-CBC", length: 256, iv: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+				    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])};
 
 function generateKeyRing() {
     var reps = {};
@@ -44,6 +46,11 @@ function generateKeyRing() {
 function stringToArrayBuffer(string) {
        var encoder = new TextEncoder("utf-8");
        return encoder.encode(string);
+}
+
+function arrayBufferToString(bytes) {
+       var encoder = new TextEncoder("utf-8");
+       return encoder.decode(bytes);
 }
 
 function arrayBufferToBase64(buffer) {
@@ -201,6 +208,7 @@ function importAndDecryptKeyring(encKRing, pwd) {
     });
 }
 
+/*
 function byteArrayToString(bytes) {
     var chars = [];
     for(var i = 0, n = bytes.length; i < n;) {
@@ -217,26 +225,27 @@ function stringToByteArray(str) {
     }
     return bytes;
 }
+*/
 
 function encrypt(jsonStr, pkeyEncrypt) {
-    var ptBytes = stringToByteArray(jsonStr);
     var aesSessionKey;
     var aesSessionKeyBytes; 
     var ctb64;
     var encSessionKeyb64; 
     return new Promise(function(resolve, reject) {
+	var ptBytes = stringToArrayBuffer(jsonStr);
 	// generate AES session key
-	crypto.subtle.generateKey(AES_ENCRYPT_ALGORITHM, true, ["encrypt", "decrypt"]).then(function(aesk) {
+	crypto.subtle.generateKey(AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV, true, ["encrypt", "decrypt"]).then(function(aesk) {
 	    aesSessionKey = aesk;
-	    return crypto.subtle.encrypt(AES_ENCRYPT_ALGORITHM, aesSessionKey, ptBytes);
+	    return crypto.subtle.encrypt(AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV, aesSessionKey, ptBytes);
 	}).then(function(ctBytes) {
-	    ctb64 = byteArrayToBase64(ctBytes);
+	    ctb64 = arrayBufferToBase64(ctBytes);
 	    return crypto.subtle.exportKey("raw", aesSessionKey);
 	}).then(function(keyStr) {
-	    aesSessionKeyBytes = stringToByteArray(keyStr);
+	    aesSessionKeyBytes = stringToArrayBuffer(keyStr);
 	    return crypto.subtle.encrypt(RSA_ENCRYPT_ALGORITHM, pkeyEncrypt, aesSessionKeyBytes); 
 	}).then(function(encSessionKeyBytes) {
-	    return resolve({"ct": ctb64, "enckey": byteArrayToBase64(encSessionKeyBytes)}); 
+	    return resolve({"ct": ctb64, "enckey": arrayBufferToBase64(encSessionKeyBytes)}); 
 	}).catch(function(err) {
 	    return reject(err);
 	}); 
@@ -245,35 +254,35 @@ function encrypt(jsonStr, pkeyEncrypt) {
 
 function decrypt(ct, skeyEncrypt) {
     return new Promise(function(resolve, reject) {
-	var encAesBytes = base64ToByteArray(ct["enckey"]); 
+	var encAesBytes = base64ToArrayBuffer(ct["enckey"]); 
 	crypto.subtle.decrypt("RSA_ENCRYPT_ALGORITHM", skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
 	    return crypto.subtle.importKey("raw", aeskeyBytes, AES_ENCRYPT_ALGORITHM, true, ["encrypt", "decrypt"]); 
 	}).then(function(aesKey) {
-	    var ctBytes = base64ToByteArray(ct["ct"]); 
-	    return crypto.subtle.decrypt("AES_ENCRYPT_ALGORITHM", aesKey, ctBytes);
+	    var ctBytes = base64ToArrayBuffer(ct["ct"]); 
+	    return crypto.subtle.decrypt("AES_ENCRYPT_ALGORITHM_WITH_RANDOM_IV", aesKey, ctBytes);
 	}).then(function(ptBytes) {
-	    return resolve(byteArrayToString(ptBytes)); 
+	    return resolve(arrayBufferToString(ptBytes)); 
 	}).catch(function(err) { return reject(err)}); 
     });  
 }
 
 function reencryptSessionKey(encAesKey, skeyEncrypt, pkeyEncryptDest) {
     return new Promise(function(resolve, reject) {
-	var encAesBytes = base64ToByteArray(encAesKey);
+	var encAesBytes = base64ToArrayBuffer(encAesKey);
 	crypto.subtle.decrypt("RSA_ENCRYPT_ALGORITHM", skeyEncrypt, encAesBytes).then(function(aeskeyBytes) {
 	    return crypto.subtle.encrypt(RSA_ENCRYPT_ALGORITHM, pkeyEncryptDest, aeskeyBytes); 
 	}).then(function(newEncKeyBytes) {
-	    return resolve(byteArrayToBase64(newEncKeyBytes)); 
+	    return resolve(arrayBufferToBase64(newEncKeyBytes)); 
 	}).catch(function(err) { reject(err); });
     }); 
 }
 
 function sign(jsonStr, skeySign) {
-    var msgBytes = stringToByteArray(jsonStr);
+    var msgBytes = stringToArrayBuffer(jsonStr);
     var sigb64; 
     return new Promise(function(resolve, reject) {
 	crypto.subtle.sign(SIGN_ALGORITHM, skeySign, msgBytes).then(function(sigBytes) {
-	    return resolve(byteArrayToBase64(sigBytes)); 
+	    return resolve(arrayBufferToBase64(sigBytes)); 
 	}).catch(function (err) {
 	    return reject(err);
 	});
@@ -281,7 +290,7 @@ function sign(jsonStr, skeySign) {
 }
 
 function verify(msgStr, sigb64, pkeySign) {
-    var msgBytes = stringToByteArray(msg); 
-    var sigBytes = base64ToByteArray(sigb64); 
+    var msgBytes = stringToArrayBuffer(msg); 
+    var sigBytes = base64ToArrayBuffer(sigb64); 
     return crypto.subtle.verify(SIGN_ALGORITHM, pkeySign, sigBytes, msgBytes);
 }
