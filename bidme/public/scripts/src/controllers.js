@@ -72,24 +72,28 @@ define(['angular'], function (angular) {
     	    importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
     		return encryptAndExportKeyring(kr, '');
     	    }).then(function(eekr) {
-    		sessionStorage.setItem('keyRing',JSON.stringify(eekr));
-    		console.log("Welcome! Keyring stored in the sessionStorage");
-    		window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
-    		return vm.$location.path("/home");
-    	    }).catch(function(err) {
-    		console.log(err);
-            if(data.type == "CLIENT" && data.profile_id){
-                vm.$location.path("/profile");
-            } else {
+    		  sessionStorage.setItem('keyRing',JSON.stringify(eekr));
+    		  console.log("Welcome! Keyring stored in the sessionStorage");
+              if(data.type == "CLIENT" && !!(data.profile_id)){
                 vm.$location.path("/home");
+                window.location.href = "/#/home";
+                return;
+            } else {
+                vm.$location.path("/profile");
+                window.location.href = "/#/profile";
+                return;
             }
-    		return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
+    		  // window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
+    		  // return vm.$location.path("/home");
+    	    }).catch(function(err) {
+    		  console.log(err);
+    		  return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
     	    });
     	},function(data, status) {
     	    if(status===401){
-    		return vm.toastr.error('Wrong username and/or password!');
+    		  return vm.toastr.error('Wrong username and/or password!');
     	    }else{
-    		return vm.toastr.error(data);
+    		  return vm.toastr.error(data);
     	    }
     	});
     };
@@ -390,7 +394,7 @@ define(['angular'], function (angular) {
       console.log(vm.dataSources)
       if (vm.dataSources.isFinancialOn) {
         console.log("financial");
-        Profile.profile.financial = computeFinProfile();
+        // Profile.profile.financial = computeFinProfile();
       }
       if (vm.dataSources.isSocialOn) {
         console.log("social");
@@ -401,6 +405,7 @@ define(['angular'], function (angular) {
 
       vm.ResourceService.createProfile(Profile);
       vm.$location.path("/home");
+      window.location.href = "/#/home";
     };
 
     function ComputeFinDataScoreCtrl(ResourceService, toastr)
