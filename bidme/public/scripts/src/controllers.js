@@ -9,6 +9,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('BidCtrl', ['ResourceService', 'toastr', BidCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
+    mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
 
     function ProvaCtrl() {
@@ -224,11 +225,6 @@ define(['angular'], function (angular) {
         vm.bid = null;
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
-        vm.dataSources = {
-          isFinancialOn : false,
-          isSocialOn : false,
-          isHealthOn : false,
-        };
     }
 
     BidCtrl.prototype.createBid = function()
@@ -245,7 +241,24 @@ define(['angular'], function (angular) {
             }
         });
 
-      var profile = null;
+    };
+
+    function ProfileCtrl(ResourceService, toastr)
+    {
+        var vm = this;
+        vm.ResourceService = ResourceService;
+        vm.toastr = toastr;
+        vm.dataSources = {
+          isFinancialOn : false,
+          isSocialOn : false,
+          isHealthOn : false,
+        };
+        var profile = null;
+    }
+
+    ProfileCtrl.prototype.createProfile = function()
+    {
+      var vm = this;
 
       console.log("Get the user profile");
       console.log(vm.dataSources)
