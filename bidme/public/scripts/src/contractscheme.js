@@ -20,10 +20,6 @@ var AES_ENCRYPT_ALGORITHM={name: "AES-CBC",
 
 function generateKeyRing() {
     var reps = {};
-    //skeySign = null; 
-    //var pkeySign = null;
-    //var skeyEncrypt = null;
-    //var pkeyEncrypt = null;
     return new Promise(function (resolve, reject) {
         crypto.subtle.generateKey(
 	    	RSA_ENCRYPT_ALGORITHM, 
@@ -70,6 +66,7 @@ function base64ToArrayBuffer(base64) {
     return bytes.buffer;
 }
 
+//returns a promise to an AES key with 0 IV
 function deriveKeyFromPwd(pwd) {
         // First, create a PBKDF2 "key" containing the password
         return crypto.subtle.importKey(
@@ -97,124 +94,110 @@ function deriveKeyFromPwd(pwd) {
 
 
 //input sKey, cryptoKey
-function encryptPrivateKey(sKey, pwd) {
-    var aesKey;
-    var exportedSKey; //ArrayBuffer
+//returns a promise to an ArrayBuffer containing the AES encryption of
+//the pkcs8
+function encryptPrivateKey(sKey, pwdAesKey) {
 
-    return new Promise(function (resolve, reject) {
-        deriveKeyFromPwd(pwd).then(function(aek) {
-	    aesKey = aek;
-	    return crypto.subtle.exportKey(
-		    "pkcs8",
-		    sKey);
-	}).then(function(expk) {
-	    exportedSKey=expk;
+    return crypto.subtle.exportKey("pkcs8",sKey)
+	.then(function(exportedSKey) {
 	    return crypto.subtle.encrypt(
 		    AES_ENCRYPT_ALGORITHM,
-		    aesKey,
+		    pwdAesKey,
 		    exportedSKey);
-	}).then(function(encK) {
-	    return resolve(arrayBufferToBase64(encK));
-	}).catch(function(err) {
-	    return reject(err);
 	});
-    });
 } 
 
-//input encKey (base64, PKCS8), pwd
-function decryptPrivateKey(encKey, pwd, algo, usage) {
-    var encKeyBuf = base64ToArrayBuffer(encKey);
+//input encKey (ArrayBuffer, PKCS8), pwd
+function decryptPrivateKey(encKeyBuf, pwdAesKey, algo, usage) {
     var aesKey; 
-    return deriveKeyFromPwd(pwd).then(function(aek) {
-	aesKey = aek;
-	return crypto.subtle.decrypt(AES_ENCRYPT_ALGORITHM, aesKey, encKeyBuf)
-    }).then(function(skeyBytes) {
-	return crypto.subtle.importKey("pkcs8", skeyBytes, algo, true, usage);
-    });
-}
-
-function test() {
-    generateKeyRing().then(function(kr) {
-	crypto.subtle.exportKey("pkcs8", kr.skeyEncrypt).then(function(skeyStr) { console.log(arrayBufferToBase64(skeyStr)); }); 
-	encryptPrivateKey(kr.skeyEncrypt, "pwd").then(function(encSkey) {
-	    return decryptPrivateKey(encSkey, "pwd", RSA_ENCRYPT_ALGORITHM, ["decrypt"]);
-	}).then(function(decSkey) {
-	    return crypto.subtle.exportKey("pkcs8", decSkey);
-	}).then(function(skeyStr2) {
-	    console.log(arrayBufferToBase64(skeyStr2));
+    return crypto.subtle.decrypt(AES_ENCRYPT_ALGORITHM, pwdAesKey, encKeyBuf)
+	.then(function(skeyBytes) {
+	    return crypto.subtle.importKey("pkcs8", skeyBytes, algo, true, usage);
 	});
-    });
 }
-
-
 
 
 //generates and exports a keyring
 //returns a promise to an encrypted keyring
-function generateAndExportKeyring(pwd) {
-    var keyRing;
+function encryptAndExportKeyring(keyRing, pwd) {
+    var pwdAesKey;
     var exportedKeyRing={};
     
     return new Promise(function(resolve, reject) {
-	    generateKeyRing().then(function (kr) {
-		keyRing = kr;
-		//export the encrypt pubkey
-                return crypto.subtle.exportKey("spki",keyRing.pkeyEncrypt);
-	    }).then(function(ab) {
-		exportedKeyRing.pkeyEncrypt = arrayBufferToBase64(ab);
-		//export the encrypt privkey
-		return encryptPrivateKey(keyRing.skeyEncrypt, pwd);
-	    }).then(function(b64) {
-		exportedKeyRing.skeyEncrypt = b64;
-		//export the sign key
-		return crypto.subtle.exportKey("spki",keyRing.pkeySign);
-	    }).then(function(ab) {
-		exportedKeyRing.pkeySign = arrayBufferToBase64(ab);
-		//export the encrypt privkey
-		return encryptPrivateKey(keyRing.skeySign, pwd);
-	    }).then(function(b64) {
-		exportedKeyRing.skeySign = b64;
-		return resolve(exportedKeyRing);
-	    }).catch(function(err) {
-		reject(err);
-	    });
+	deriveKeyFromPwd(pwd).then(function (k) {
+	    pwdAesKey = k;
+	    //export the encrypt pubkey
+	    return crypto.subtle.exportKey("spki",keyRing.pkeyEncrypt);
+	}).then(function(ab) {
+	    exportedKeyRing.pkeyEncrypt = arrayBufferToBase64(ab);
+	    //export the encrypt privkey
+	    return encryptPrivateKey(keyRing.skeyEncrypt, pwdAesKey);
+	}).then(function(ab) {
+	    exportedKeyRing.skeyEncrypt = arrayBufferToBase64(ab);
+	    //export the sign key
+	    return crypto.subtle.exportKey("spki",keyRing.pkeySign);
+	}).then(function(ab) {
+	    exportedKeyRing.pkeySign = arrayBufferToBase64(ab);
+	    //export the encrypt privkey
+	    return encryptPrivateKey(keyRing.skeySign, pwdAesKey);
+	}).then(function(ab) {
+	    exportedKeyRing.skeySign = arrayBufferToBase64(ab);
+	    return resolve(exportedKeyRing);
+	}).catch(function(err) {
+	    return reject(err);
+	});
+    });
+}
+
+//generates and exports a keyring
+//returns a promise to an encrypted keyring
+function generateEncryptAndExportKeyring(pwd) {
+    return generateKeyRing().then(function(kr) {
+	return encryptAndExportKeyring(kr, pwd);
     });
 }
 
 
 //imports the encrypted keyring
 function importAndDecryptKeyring(encKRing, pwd) {
+    var pwdAesKey;
     var keyRing={};
 
     return new Promise(function(resolve, reject) {
+	deriveKeyFromPwd(pwd).then(function (k) {
+	    pwdAesKey = k;
 	    //imports the Encrypt public key
-	    crypto.subtle.importKey(
+	    return crypto.subtle.importKey(
 		    "spki",
 		    base64ToArrayBuffer(encKRing.pkeyEncrypt),
 		    RSA_ENCRYPT_ALGORITHM,
 		    true, ['encrypt'])
-		.then(function(crk) {
-		    keyRing.pkeyEncrypt = crk;
-		    //import the Encrypt private key
-		    return decryptPrivateKey(encKRing.skeyEncrypt,pwd,RSA_ENCRYPT_ALGORITHM,['decrypt']);
-		}).then(function(crk) {
-		    keyRing.skeyEncrypt = crk;
-		    //imports the sign public key
-		    return crypto.subtle.importKey(
-			    "spki",
-			    base64ToArrayBuffer(encKRing.pkeySign),
-			    SIGN_ALGORITHM,
-			    true, ['verify']);
-		}).then(function(crk) {
-		    keyRing.pkeySign = crk;
-		    //import the Sign private key  
-		    return decryptPrivateKey(encKRing.skeySign,pwd,SIGN_ALGORITHM,['sign']);
-		}).then(function(crk) {
-		    keyRing.skeySign = crk;
-		    return resolve(keyRing);
-		}).catch(function(err) {
-		    return reject(err);
-		});
+	}).then(function(crk) {
+	    keyRing.pkeyEncrypt = crk;
+	    //import the Encrypt private key
+	    return decryptPrivateKey(
+		    base64ToArrayBuffer(encKRing.skeyEncrypt),
+		    pwdAesKey,RSA_ENCRYPT_ALGORITHM,['decrypt']);
+	}).then(function(crk) {
+	    keyRing.skeyEncrypt = crk;
+	    //imports the sign public key
+	    return crypto.subtle.importKey(
+		    "spki",
+		    base64ToArrayBuffer(encKRing.pkeySign),
+		    SIGN_ALGORITHM,
+		    true, ['verify']);
+	}).then(function(crk) {
+	    keyRing.pkeySign = crk;
+	    //import the Sign private key  
+	    return decryptPrivateKey(
+		    base64ToArrayBuffer(encKRing.skeySign)
+		    ,pwdAesKey,SIGN_ALGORITHM,['sign']);
+	}).then(function(crk) {
+	    keyRing.skeySign = crk;
+	    return resolve(keyRing);
+	}).catch(function(err) {
+	    return reject(err);
+	});
     });
 }
 
