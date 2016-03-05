@@ -145,3 +145,76 @@ function test() {
 	});
     });
 }
+
+
+
+
+//generates and exports a keyring
+//returns a promise to an encrypted keyring
+function generateAndExportKeyring(pwd) {
+    var keyRing;
+    var exportedKeyRing={};
+    
+    return new Promise(function(resolve, reject) {
+	    generateKeyRing().then(function (kr) {
+		keyRing = kr;
+		//export the encrypt pubkey
+                return crypto.subtle.exportKey("spki",keyRing.pkeyEncrypt);
+	    }).then(function(ab) {
+		exportedKeyRing.pkeyEncrypt = arrayBufferToBase64(ab);
+		//export the encrypt privkey
+		return encryptPrivateKey(keyRing.skeyEncrypt, pwd);
+	    }).then(function(b64) {
+		exportedKeyRing.skeyEncrypt = b64;
+		//export the sign key
+		return crypto.subtle.exportKey("spki",keyRing.pkeySign);
+	    }).then(function(ab) {
+		exportedKeyRing.pkeySign = arrayBufferToBase64(ab);
+		//export the encrypt privkey
+		return encryptPrivateKey(keyRing.skeySign, pwd);
+	    }).then(function(b64) {
+		exportedKeyRing.skeySign = b64;
+		return resolve(exportedKeyRing);
+	    }).catch(function(err) {
+		reject(err);
+	    });
+    });
+}
+
+
+//imports the encrypted keyring
+function importAndDecryptKeyring(encKRing, pwd) {
+    var keyRing={};
+
+    return new Promise(function(resolve, reject) {
+	    //imports the Encrypt public key
+	    crypto.subtle.importKey(
+		    "spki",
+		    base64ToArrayBuffer(encKRing.pkeyEncrypt),
+		    RSA_ENCRYPT_ALGORITHM,
+		    true, ['encrypt'])
+		.then(function(crk) {
+		    keyRing.pkeyEncrypt = crk;
+		    //import the Encrypt private key
+		    return decryptPrivateKey(encKRing.skeyEncrypt,pwd,RSA_ENCRYPT_ALGORITHM,['decrypt']);
+		}).then(function(crk) {
+		    keyRing.skeyEncrypt = crk;
+		    //imports the sign public key
+		    return crypto.subtle.importKey(
+			    "spki",
+			    base64ToArrayBuffer(encKRing.pkeySign),
+			    SIGN_ALGORITHM,
+			    true, ['verify']);
+		}).then(function(crk) {
+		    keyRing.pkeySign = crk;
+		    //import the Sign private key  
+		    return decryptPrivateKey(encKRing.skeySign,pwd,SIGN_ALGORITHM,['sign']);
+		}).then(function(crk) {
+		    keyRing.skeySign = crk;
+		    return resolve(keyRing);
+		}).catch(function(err) {
+		    return reject(err);
+		});
+    });
+}
+
