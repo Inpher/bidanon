@@ -1,3 +1,5 @@
+var marvel = require('marvel-characters');
+
 module.exports = function(models){
 
     var User = models.user;
@@ -35,6 +37,14 @@ module.exports = function(models){
 
         login:function(req,res)
         {
+            PublicProfile.findOne({"u_id": req.user._id},function(err, profile) {
+                if (err)
+                    res.send(500, {'message': err});
+                // check to see if theres already a user with that email
+                if (profile) {
+                    res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id,"profile_id":profile._id});
+                }
+            });
             res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id});
         },
 
@@ -169,7 +179,7 @@ module.exports = function(models){
           var profile = req.body.profile;
           var query = { _id: _id };
           var newProfile = new PublicProfile({
-            name: "James",
+            name: marvel(),
             avgMonthlyIncome : profile.financial.avgIncome,
             avgMonthlySpendings : profile.financial.avgSpendings,
             desc : "hello world I am cool",
@@ -209,12 +219,9 @@ module.exports = function(models){
             var profile={};
             Request.findOne({ "_id":  _id}, function(err,request){
                 profile.request = request;
-                console.log( profile.request);
-                console.log(profile.request.u_id);
                 PublicProfile.findOne({"u_id": profile.request.u_id}, function(err,publicProfile){
                     profile.publicProfile = publicProfile;
                     res.json({profile:profile});
-                    console.log(profile.publicProfile);
             });
         });
             

@@ -10,7 +10,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
     mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
-    mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
+    mainAppControllers.controller('ProfileCtrl', ['$location', 'ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
 
     function ProvaCtrl() {
@@ -68,7 +68,11 @@ define(['angular'], function (angular) {
                 vm.localStorageService.set("auth_token",data.auth_token);
                 vm.localStorageService.set("type", data.type);
                 vm.localStorageService.set("u_id", data._id);
-                vm.$location.path("/home");
+                if(data.type == "CLIENT" && data.profile_id){
+                    vm.$location.path("/profile");
+                } else {
+                    vm.$location.path("/home");
+                }
             },function(data, status) {
                 if(status===401){
                     vm.toastr.error('Wrong username and/or password!');
@@ -304,11 +308,12 @@ define(['angular'], function (angular) {
 
     };
 
-    function ProfileCtrl(ResourceService, toastr)
+    function ProfileCtrl($location, ResourceService, toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
+        vm.$location = $location;
         vm.dataSources = {
           isFinancialOn : false,
           isSocialOn : false,
@@ -350,6 +355,7 @@ define(['angular'], function (angular) {
       }
 
       vm.ResourceService.createProfile(Profile);
+      vm.$location.path("/home");
     };
 
     function ComputeFinDataScoreCtrl(ResourceService, toastr)
