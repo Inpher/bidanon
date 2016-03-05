@@ -1,0 +1,6 @@
+Application Type	web
+Application Name	loanchecker
+Developer Email	alex@inpher.io
+App Description	credit score checker
+Consumer Key	0ljnr3kep31wr003ytmtaf5feu5nkck3jbsn52vq
+Consumer Secret	p4lcjmnfyzp25z2dzo3yhtpl01evyjzpszh52uzi

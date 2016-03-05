@@ -9,6 +9,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('BidCtrl', ['ResourceService', 'toastr', BidCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
+    mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
 
     function ProvaCtrl() {
         var vm = this;
@@ -262,23 +263,10 @@ define(['angular'], function (angular) {
       //vm.ResourceService.createProfile(profile);
     };
 
-    BidCtrl.prototype.setDataSources = function()
+    function ComputeFinDataScoreCtrl(ResourceService, toastr)
     {
-      var vm = this;
-      var DataSources = {dataSources: vm.dataSources};
-
-      if (DataSoucres.financial) {
-        //TODO: call computeFinProfile
-        console.log("financial");
-      }
-      if (DataSources.social) {
-        console.log("social");
-      }
-      if (DataSources.health) {
-        console.log("health");
-      }
-
-      vm.ResourceService.createProfile(DataSources);
+	   var vm = this;
+	   vm.hello='HelloWorld';
     }
 
     return mainAppControllers;

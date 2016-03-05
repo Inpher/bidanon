@@ -163,9 +163,11 @@ module.exports = function(models){
                 res.json({bids: bids });
             });
 
-        }
+        },
 
-
+    	// computeFindata: function(req,res)
+    	// {
+    	// }
     }
 
 }
