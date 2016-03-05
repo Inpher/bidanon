@@ -10,59 +10,59 @@ module.exports = function(models){
 
     return {
 
-        signup: function (req,res) {
-            var body = req.body;
-            console.log(body);
-            return User.findOne({ username: body.username}, next1);
-	    function next1(err, user) {
-                if (err)
-                    return res.send(500, {'message': err});
-                // check to see if theres already a user with that email
-                if (user) {
-                    return res.send(403, {'message': 'User already exist!'});
-                }
-		var newUser = 
-		    new User({
-			username: body.username, 
-			email: body.email, 
-			type: body.type, 
-			password:body.password,
-			encKeyRing: body.encKeyRing
-		    });
-		console.log(newUser);
-		return newUser.save(next2);
-	    }
-	    function next2(err, user) {
-		if (err){
-		    return res.send(500, {'message': err});
-		}
-		return res.json({'message': 'User was successfully registered!'});
-	    }
-        },
+      signup: function (req,res) {
+        var body = req.body;
+        console.log(body);
+        return User.findOne({ username: body.username}, next1);
+        function next1(err, user) {
+          if (err)
+          return res.send(500, {'message': err});
+          // check to see if theres already a user with that email
+          if (user) {
+            return res.send(403, {'message': 'User already exist!'});
+          }
+          var newUser =
+          new User({
+            username: body.username,
+            email: body.email,
+            type: body.type,
+            password:body.password,
+            encKeyRing: body.encKeyRing
+          });
+          console.log(newUser);
+          return newUser.save(next2);
+        }
+        function next2(err, user) {
+          if (err){
+            return res.send(500, {'message': err});
+          }
+          return res.json({'message': 'User was successfully registered!'});
+        }
+      },
 
         login:function(req,res)
         {
-            PublicProfile.findOne({"u_id": req.user._id},function(err, profile) {
-                if (err)
-                    res.send(500, {'message': err});
-                // check to see if theres already a user with that email
-                if (profile) {
-                    res.json({ 
-                        auth_token: req.user.token.auth_token, 
-                        type:req.user.type, 
-                        "_id":req.user._id,
-                        "profile_id":profile._id,
-                        encKeyRing:req.user.encKeyRing});
-                }
+          PublicProfile.findOne({"u_id": req.user._id},function(err, profile) {
+            if (err)
+            res.send(500, {'message': err});
+            // check to see if theres already a user with that email
+            if (profile) {
+              return res.json({
+                auth_token: req.user.token.auth_token,
+                type:req.user.type,
+                "_id":req.user._id,
+                "profile_id":profile._id,
+                encKeyRing:req.user.encKeyRing});
+            } else {
+              return res.json({
+                auth_token: req.user.token.auth_token,
+                type:req.user.type,
+                "_id":req.user._id,
+                encKeyRing:req.user.encKeyRing
+              });
+              }
             });
-	    console.log(req.user);
-            res.json({ 
-        		auth_token: req.user.token.auth_token, 
-        		type:req.user.type, 
-        		"_id":req.user._id,
-        		encKeyRing:req.user.encKeyRing
-	    });
-        },
+          },
 
         logout: function(req,res)
         {
@@ -193,7 +193,6 @@ module.exports = function(models){
           var _id = req.user.id;
           console.log(req)
           var profile = req.body.profile;
-          var query = { _id: _id };
           var newProfile = new PublicProfile({
             name: marvel(),
             avgMonthlyIncome : profile.financial.avgIncome,
@@ -202,12 +201,22 @@ module.exports = function(models){
             score : profile.financial.score,
             u_id : req.user.id,
           })
-          newProfile.save(function (err, profile) {
-            if (err) {
-              res.send(500, {'message': err});
-            }
-            res.json({ 'message': 'Profile was successfully created'});
-          })
+          PublicProfile.update(
+            { "u_id": _id },
+            newProfile,
+            {upsert:true},
+            function (err, profile) {
+              if (err) {
+                res.send(500, {'message': err});
+              }
+              res.json({ 'message': 'Profile was successfully created'});
+          });
+          //newProfile.save(function (err, profile) {
+          //  if (err) {
+          //    res.send(500, {'message': err});
+          //  }
+          //  res.json({ 'message': 'Profile was successfully created'});
+          //})
         },
 
         getBids: function(req,res)
@@ -240,7 +249,7 @@ module.exports = function(models){
                     res.json({profile:profile});
             });
         });
-            
+
 
         }
     }
