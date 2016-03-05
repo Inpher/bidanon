@@ -7,8 +7,8 @@ module.exports = function(connection) {
     var bidSchema = new Schema({
         intRate: Number,
         maturity: Number,
-        u_id: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-        req_id: [{type: mongoose.Schema.Types.ObjectId, ref: 'Request'}]
+        u_id: mongoose.Schema.Types.ObjectId,
+        req_id: mongoose.Schema.Types.ObjectId
     });
 
     var Bid = connection.model('Bid', bidSchema);

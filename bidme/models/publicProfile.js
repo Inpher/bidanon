@@ -6,7 +6,7 @@ module.exports = function(connection) {
 
     var publicProfileSchema = new Schema({
         name: String,
-        u_id: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+        u_id: mongoose.Schema.Types.ObjectId,
         avgMonthlyIncome: Number,
         avgMonthlySpendings: Number,
         desc: String,

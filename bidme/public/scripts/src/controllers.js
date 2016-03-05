@@ -5,9 +5,10 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('NavCtrl', ['$location', 'localStorageService', 'AuthenticationService', NavCtrl]);
     mainAppControllers.controller('LoginCtrl', ['$location', 'ResourceService' ,'CryptoJSService', 'localStorageService', 'toastr' ,LoginCtrl]);
     mainAppControllers.controller('RegistrationCtrl', ['ResourceService', 'CryptoJSService', 'toastr', RegistrationCtrl]);
-    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
+    mainAppControllers.controller('HomeCtrl', ['$location', 'ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
+    mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
     mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
     mainAppControllers.controller('ComputeFinDataScoreCtrl', ['ResourceService', 'toastr', ComputeFinDataScoreCtrl]);
@@ -56,29 +57,35 @@ define(['angular'], function (angular) {
     LoginCtrl.prototype.submit = function()
     {
         var vm = this;
+	if(vm.username===undefined || vm.password ===undefined){
+            return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
+	}
+
         var salt = vm.username;
         var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-
         var user = {"username": vm.username, "password": enc_password.toString()};
 
-        if(vm.username!==undefined || vm.password !==undefined){
-
-            vm.ResourceService.login(user).then(function(data){
-                vm.localStorageService.set("auth_token",data.auth_token);
-                vm.localStorageService.set("type", data.type);
-                vm.localStorageService.set("u_id", data._id);
-                vm.$location.path("/home");
-            },function(data, status) {
-                if(status===401){
-                    vm.toastr.error('Wrong username and/or password!');
-                }else{
-                    vm.toastr.error(data);
-                }
-            });
-
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
-        }
+	vm.ResourceService.login(user).then(function(data){
+	    vm.localStorageService.set("auth_token",data.auth_token);
+	    vm.localStorageService.set("type", data.type);
+	    vm.localStorageService.set("u_id", data._id);
+	    importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
+		return encryptAndExportKeyring(kr, '');
+	    }).then(function(eekr) {
+		sessionStorage.setItem('keyRing',JSON.stringify(eekr));
+		vm.$location.path("/home");
+	    }).catch(function(err) {
+		console.log(err);
+		vm.$location.path("/home");
+		return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
+	    });
+	},function(data, status) {
+	    if(status===401){
+		return vm.toastr.error('Wrong username and/or password!');
+	    }else{
+		return vm.toastr.error(data);
+	    }
+	});
     };
 
     function RegistrationCtrl (ResourceService, CryptoJS, toastr)
@@ -91,62 +98,93 @@ define(['angular'], function (angular) {
 
     RegistrationCtrl.prototype.signup = function()
     {
-        var vm = this;
-        var salt = vm.username;
+	var vm = this;
+        if(vm.username===undefined || vm.password===undefined){
+	    return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+	}
+	if(vm.password !== vm.check_password){
+	    return vm.toastr.warning('password and check_password must be the same!');
+	}
+	//generate a keyring
+	generateEncryptAndExportKeyring(vm.password).then(function(ekr) {
+	    var salt = vm.username;
+	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+	    var user = { 
+		"username": vm.username, 
+		"password": enc_password.toString(), 
+		"type": "CLIENT", 
+		"encKeyRing": ekr,
+	    };
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "type": "CLIENT", "check_password" : enc_check_password.toString() };
-
-        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
-            if(vm.password !== vm.check_password){
-                vm.toastr.warning('password and check_password must be the same!');
-            }else{
-                vm.ResourceService.signup(user).then(function(){
-                    vm.toastr.success('User successfully registered!');
-                    vm.username = null;
-                    vm.password = null;
-                    vm.check_password = null;
-                },function(data) {
-                    vm.toastr.error(data.message);
-                });
-            }
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
-        }
+	    return vm.ResourceService.signup(user);
+	}).then(function() {
+	    vm.toastr.success('User successfully registered!');
+	    vm.username = null;
+	    vm.password = null;
+	    vm.check_password = null;
+	},function(data) {
+	    console.log(data);
+	    vm.toastr.error(data.message);
+	});
     };
 
     RegistrationCtrl.prototype.signupBank = function()
     {
-        var vm = this;
-        var salt = vm.username;
+	var vm = this;
+        if(vm.username===undefined || vm.password===undefined){
+	    return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+	}
+	if(vm.password !== vm.check_password){
+	    return vm.toastr.warning('password and check_password must be the same!');
+	}
+	//generate a keyring
+	generateEncryptAndExportKeyring(vm.password).then(function(ekr) {
+	    var salt = vm.username;
+	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+	    var user = { 
+		"username": vm.username, 
+		"password": enc_password.toString(), 
+		"type": "BANK", 
+		"encKeyRing": ekr,
+	    };
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "type": "BANK", "check_password" : enc_check_password.toString() };
-        console.log(user);
-        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
-            if(vm.password !== vm.check_password){
-                vm.toastr.warning('password and check_password must be the same!');
-            }else{
-                vm.ResourceService.signup(user).then(function(){
-                    vm.toastr.success('User successfully registered!');
-                    vm.username = null;
-                    vm.password = null;
-                    vm.check_password = null;
-                },function(data) {
-                    vm.toastr.error(data.message);
-                });
-            }
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
-        }
+	    return vm.ResourceService.signup(user);
+	}).then(function() {
+	    vm.toastr.success('User successfully registered!');
+	    vm.username = null;
+	    vm.password = null;
+	    vm.check_password = null;
+	},function(data) {
+	    console.log(data);
+	    vm.toastr.error(data.message);
+	});
     };
 
+    
+    function InfoRequestCtrl(ResourceService, data, toastr) {
+        var vm = this;
+        vm.bid = null;
+        vm.data = data;
+        vm.ResourceService = ResourceService;
+        vm.toastr = toastr;
+        vm.profile = data[0].profile;
+    };
 
-    function HomeCtrl(ResourceService, data, localStorageService,toastr)
+    InfoRequestCtrl.prototype.placeBid = function(index){
+        var vm = this;
+        var bid = {intRate: vm.interestRate, maturity: vm.maturity};
+        vm.ResourceService.placeBid(bid).then(function(){
+            vm.toastr.success("Bid Added!");
+        },function(data, status) {
+            if(status!==401){
+                vm.toastr.error(data);
+            }
+        });
+    };
+
+    function HomeCtrl($location, ResourceService, data, localStorageService,toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
@@ -154,10 +192,10 @@ define(['angular'], function (angular) {
         vm.toastr = toastr;
         vm.type = localStorageService.get('type');
 
-        vm.request = data[0].requests;
+        vm.requests = data[0].requests;
         vm.bids = data[1].bids;
+        vm.$location = $location;
     }
-
     HomeCtrl.prototype.updatePerson = function(index, modify)
     {
         var vm = this;
@@ -227,6 +265,13 @@ define(['angular'], function (angular) {
             }
         });
     };
+
+    HomeCtrl.prototype.showProfile = function(request)
+    {
+        var vm = this;
+        var id = request._id;
+        vm.$location.path('/infoRequest/' + id);
+    }
 
     function PersonCtrl(ResourceService, toastr) {
         var vm = this;

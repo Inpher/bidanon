@@ -37,6 +37,9 @@ define(['angular'], function (angular) {
             var deferred = $q.defer();
             $http({method: method, url: URL, data:data}).
                 success(function(data) {
+                    if(data.profile){
+                        data[0] = data.profile;
+                    }
                     deferred.resolve(data);
                     if(URL==="GET") _genericCallback(key,data);
                 }).
@@ -57,14 +60,17 @@ define(['angular'], function (angular) {
             getRequests : function(refresh){
                 return _promisesGetter('GET','/api/requests', null, "requests", refresh);
             },
+            getInfoRequest : function(rid){
+                return _promisesGetter('GET','/api/infoRequest/'+rid, null, "profile", true);
+            },
             createRequest : function(request){
                 return _ajaxRequest('POST', '/api/request', request, null);
             },
             createProfile : function(profile){
               return _ajaxRequest('POST', '/api/profile', profile, null);
             },
-            deleteBid : function(bid){
-                return _ajaxRequest('DELETE', '/api/bid/'+bid._id, null, null);
+            placeBid : function(bid){
+                return _ajaxRequest('POST', '/api/bid/'+bid._id, bid, null);
             },
             createPerson : function(person){
                 return _ajaxRequest('POST', '/api/person', person, null);

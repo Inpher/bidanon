@@ -11,7 +11,13 @@ module.exports = function(connection) {
         password: String,
         email: String,
         type:{type: String, enum:['CLIENT', 'BANK']},
-        token : {
+        encKeyRing: {
+	    skeyEncrypt: String,
+	    pkeyEncrypt: String,
+	    skeySign: String,
+	    pkeySign: String,
+	},
+	token : {
             auth_token: String,
             createDate: {type: Date, required: true, default: moment()}
         }

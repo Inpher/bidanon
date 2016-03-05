@@ -7,7 +7,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xs-offset-0 col-sm-offset-0 col-md-offset-3 col-lg-offset-3 toppad" >
           <div class="panel panel-success">
             <div class="panel-heading">
-              <h3 class="panel-title">Deadpool</h3>
+              <h3 class="panel-title">Deadpool's Request for Justice</h3>
             </div>
             <div class="panel-body">
               <div class="row">
@@ -16,40 +16,38 @@
                   <table class="table table-user-information">
                     <tbody>
                       <tr>
-                        <td>Department:</td>
-                        <td>Programming</td>
+                        <td>Score:</td>
+                        <td>{{vm.profile.publicProfile.score}}</td>
                       </tr>
                       <tr>
-                        <td>Hire date:</td>
-                        <td>06/23/2013</td>
+                        <td>Amount:</td>
+                        <td>{{vm.profile.request.amount}}</td>
                       </tr>
                       <tr>
-                        <td>Date of Birth</td>
-                        <td>01/24/1988</td>
-                      </tr>
-                   
-                         <tr>
-                             <tr>
-                        <td>Gender</td>
-                        <td>Male</td>
-                      </tr>
-                        <tr>
-                        <td>Home Address</td>
-                        <td>Metro Manila,Philippines</td>
+                        <td>Maturity:</td>
+                        <td>{{vm.profile.request.maturity}}</td>
                       </tr>
                       <tr>
-                        <td>Email</td>
-                        <td><a href="mailto:info@support.com">info@support.com</a></td>
+                        <td>Avg Monthly Income:</td>
+                        <td>{{vm.profile.publicProfile.avgMonthlyIncome}}</td>
                       </tr>
-                        <td>Phone Number</td>
-                        <td>123-4567-890(Landline)<br><br>555-4567-890(Mobile)
-                        </td>
-                           
-                      </tr>
-                     
+                      <tr>
+                        <td>Avg Monthly Spendings:</td>
+                        <td>{{vm.profile.publicProfile.avgMonthlySpendings}}</td>
+                      </tr>                     
                     </tbody>
                   </table>
-                  <a href="#/bid" class="btn btn-primary">Bid</a>
+                  <form ng-submit="vm.placeBid()" role="form" class="form-inline">
+                    <fieldset>
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="vm.interestRate" placeholder="Interest rate" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control" ng-model="vm.maturity" placeholder="Maturity" required>
+                        </div>
+                        <input type="submit" class="btn btn-primary" value="Add"/>
+                    </fieldset>
+                </form>
                 </div>
               </div>
             </div>

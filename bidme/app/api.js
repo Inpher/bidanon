@@ -8,34 +8,45 @@ module.exports = function(models){
 
     return {
 
-        signup: function (req,res)
-        {
-
+        signup: function (req,res) {
             var body = req.body;
             console.log(body);
-            User.findOne({ username: body.username
-            },function(err, user) {
+            return User.findOne({ username: body.username}, next1);
+	    function next1(err, user) {
                 if (err)
-                    res.send(500, {'message': err});
+                    return res.send(500, {'message': err});
                 // check to see if theres already a user with that email
                 if (user) {
-                    res.send(403, {'message': 'User already exist!'});
-                }else {
-                    var newUser = new User({ username: body.username, email: body.email, type: body.type, password:body.password});
-                    console.log(newUser);
-                    newUser.save(function (err, user) {
-                        if (err){
-                            res.send(500, {'message': err});
-                        }
-                        res.json({ 'message': 'User was successfully registered!'});
-                    });
+                    return res.send(403, {'message': 'User already exist!'});
                 }
-            });
+		var newUser = 
+		    new User({
+			username: body.username, 
+			email: body.email, 
+			type: body.type, 
+			password:body.password,
+			encKeyRing: body.encKeyRing
+		    });
+		console.log(newUser);
+		return newUser.save(next2);
+	    }
+	    function next2(err, user) {
+		if (err){
+		    return res.send(500, {'message': err});
+		}
+		return res.json({'message': 'User was successfully registered!'});
+	    }
         },
 
         login:function(req,res)
         {
-            res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id});
+	    console.log(req.user);
+            res.json({ 
+		auth_token: req.user.token.auth_token, 
+		type:req.user.type, 
+		"_id":req.user._id,
+		encKeyRing:req.user.encKeyRing,
+	    });
         },
 
         logout: function(req,res)
@@ -131,6 +142,7 @@ module.exports = function(models){
             });
 
         },
+
         updateBid: function(req,res)
         {
             var _id = req.params.id;
@@ -202,6 +214,22 @@ module.exports = function(models){
             Bid.find({ "u_id":  _id},function(err,bids){
                 res.json({bids: bids });
             });
+        },
+        getInfoRequest: function (req,res) {
+            var _id = req.params.id;
+            var profile={};
+            Request.findOne({ "_id":  _id}, function(err,request){
+                profile.request = request;
+                console.log( profile.request);
+                console.log(profile.request.u_id);
+                PublicProfile.findOne({"u_id": profile.request.u_id}, function(err,publicProfile){
+                    profile.publicProfile = publicProfile;
+                    res.json({profile:profile});
+                    console.log(profile.publicProfile);
+            });
+        });
+            
+
         }
     }
 
