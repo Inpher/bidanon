@@ -138,10 +138,10 @@ module.exports = function(models){
             var _id = req.user.id;
 
             if (typeof request.amount != "number") {
-                res.send(400, {'message': "Amount must be a number!"});
+                return res.send(400, {'message': "Amount must be a number!"});
             }
             if (typeof request.maturity != "number") {
-                res.send(400, {'message': "Maturity must be a number!"});
+                return res.send(400, {'message': "Maturity must be a number!"});
             }
 
             var newRequest = new Request({
@@ -151,9 +151,9 @@ module.exports = function(models){
             })
             newRequest.save(function (err, bid) {
                 if (err){
-                    res.send(500, {'message': err});
+                    return res.send(500, {'message': err});
                 }
-                res.json({ 'message': 'Request was successfully created!'});
+                return res.json({ 'message': 'Request was successfully created!'});
             });
 
         },
@@ -169,9 +169,9 @@ module.exports = function(models){
             var query = { _id: _id };
             Bid.update(query, {score:bid.score,amount:bid.amount}, null, function (err, bid) {
                 if (err){
-                    res.send(500, {'message': err});
+                    return res.send(500, {'message': err});
                 }
-                res.json({ 'message': 'Bid was successfully updated!'});
+                return res.json({ 'message': 'Bid was successfully updated!'});
             })
 
         },
@@ -181,9 +181,9 @@ module.exports = function(models){
 
             Bid.remove({ _id:_id}, function (err, user) {
                 if (err){
-                    res.send(500, {'message': err});
+                    return res.send(500, {'message': err});
                 }
-                res.json({ 'message': 'Bid was successfully removed!'});
+                return res.json({ 'message': 'Bid was successfully removed!'});
             })
 
         },
@@ -204,30 +204,30 @@ module.exports = function(models){
           })
           newProfile.save(function (err, profile) {
             if (err) {
-              res.send(500, {'message': err});
+              return res.send(500, {'message': err});
             }
-            res.json({ 'message': 'Profile was successfully created'});
+            return res.json({ 'message': 'Profile was successfully created'});
           })
         },
 
         getBids: function(req,res)
         {
             Bid.find(function(err,bids){
-                res.json({bids: bids });
+                return res.json({bids: bids });
             });
 
         },
         getRequests: function(req,res)
         {
             Request.find(function(err,requests){
-                res.json({requests: requests });
+                return res.json({requests: requests });
             });
 
         },
         getBidsPerUser: function (req,res) {
             var _id = req.params.uid;
             Bid.find({ "u_id":  _id},function(err,bids){
-                res.json({bids: bids });
+                return res.json({bids: bids });
             });
         },
         getInfoRequest: function (req,res) {
@@ -237,7 +237,7 @@ module.exports = function(models){
                 profile.request = request;
                 PublicProfile.findOne({"u_id": profile.request.u_id}, function(err,publicProfile){
                     profile.publicProfile = publicProfile;
-                    res.json({profile:profile});
+                    return res.json({profile:profile});
             });
         });
             
