@@ -18,6 +18,11 @@
                         <p>Select which data source you wish to enable to create the profile</p>
                         <div class="checkbox">
                           <label><input type="checkbox" value="" ng-model="vm.dataSources.isFinancialOn">Financial data</label>
+                          <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
+                            <b>Please select exported financial data:</b>
+                            <br></br>
+                            <input type="file" ngf-select="vm.uploadFile($files)" multiple>
+                          </div>
                         </div>
                         <div class="checkbox">
                           <label><input type="checkbox" value="" ng-model="vm.dataSources.isSocialOn">Social data</label>

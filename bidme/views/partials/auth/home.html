@@ -12,53 +12,21 @@
 
                 <div class="panel panel-success" ng-show="vm.type == 'BANK'">
                     <!-- Default panel contents -->
-                    <div class="panel-heading" >Available Requests</div>
+                    <div class="panel-heading" >Available Loan Requests</div>
 
-                    <table class="table table-condensed">
+                    <table class="table table-condensed table-hover">
                         <thead>
                         <tr>
                             <th class="text-center" width="30%">Score</th>
-                            <th class="text-center" width="30%">Amount</th>
-                            <th class="text-center" width="20%"><span class="glyphicon glyphicon-pencil"></span></th>
-                            <th class="text-center" width="20%"><span class="glyphicon glyphicon-trash"></span></th>
+                            <th class="text-center" width="30%">Amount (CHF)</th>
+                            <th class="text-center" width="30%">Maturity (Years)</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="bid in vm.bids">
-                            <td class="text-center" ng-hide="bid.modify">{{bid.score}}</td>
-                            <td class="text-center" ng-hide="bid.modify">{{bid.amount}}</td>
-                            <td class="text-center" ng-hide="bid.modify">
-                                <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,true)">
-                                    <span class="glyphicon glyphicon-pencil"></span> Bid
-                                </button>
-                            </td>
-
-                            <td class="text-center" ng-hide="thing.modify">
-                                <a href="/#/bidInfo" type="button" class="btn btn-danger btn-sm">
-                                    <span class="glyphicon glyphicon-trash"></span>
-                                </a>
-                                <!-- <button type="button" ng-click="vm.deleteThing($index)" class="btn btn-danger btn-sm">
-                                    <span class="glyphicon glyphicon-trash"></span>
-                                </button> -->
-                            </td>
-
-
-                            <td class="text-center" ng-show="bid.modify">
-                                <input type="text" class="form-control" ng-model="bid.score" placeholder="bid.score" required>
-                            </td>
-                            <td class="text-center" ng-show="bid.modify">
-                                <input type="number" class="form-control" ng-model="bid.amount" placeholder="bid.amount" required>
-                            </td>
-                            <td class="text-center" ng-show="bid.modify">
-                                <button type="button" class="btn btn-primary btn-sm" ng-click="vm.updateBid($index,false)">
-                                    <span class="glyphicon glyphicon-pencil"></span> Update
-                                </button>
-                            </td>
-                            <td class="text-center" ng-show="bid.modify">
-                                <button ng-disabled="true" type="button" class="btn btn-danger btn-sm">
-                                    <span class="glyphicon glyphicon-trash"></span> Delete
-                                </button>
-                            </td>
+                        <tr ng-repeat="request in vm.requests" ng-click="vm.showProfile(request)">
+                            <td class="text-center" ng-hide="request.modify"></td>
+                            <td class="text-center" ng-hide="request.modify">{{request.amount}}</td>
+                            <td class="text-center" ng-hide="request.modify">{{request.maturity}}</td>
                         </tr>
 
                         </tbody>
@@ -158,7 +126,7 @@
 
                         </div> -->
 
-                        <div class="col-md-4" ng-show="vm.type != 'CLIENT'">
+                        <div class="col-md-4" ng-show="vm.type == 'CLIENT'">
 
                             <div class="panel panel-success">
                                 <div class="panel-heading">

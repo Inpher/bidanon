@@ -5,7 +5,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('NavCtrl', ['$location', 'localStorageService', 'AuthenticationService', NavCtrl]);
     mainAppControllers.controller('LoginCtrl', ['$location', 'ResourceService' ,'CryptoJSService', 'localStorageService', 'toastr' ,LoginCtrl]);
     mainAppControllers.controller('RegistrationCtrl', ['ResourceService', 'CryptoJSService', 'toastr', RegistrationCtrl]);
-    mainAppControllers.controller('HomeCtrl', ['ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
+    mainAppControllers.controller('HomeCtrl', ['$location', 'ResourceService', 'data',  'localStorageService', 'toastr', HomeCtrl]);
     mainAppControllers.controller('PersonCtrl', ['ResourceService', 'toastr', PersonCtrl]);
     mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
     mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
@@ -98,7 +98,7 @@ define(['angular'], function (angular) {
         var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
         var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "check_password" : enc_check_password.toString() };
+        var user = {"username": vm.username, "password": enc_password.toString(), "type": "CLIENT", "check_password" : enc_check_password.toString() };
 
         if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
             if(vm.password !== vm.check_password){
@@ -154,7 +154,6 @@ define(['angular'], function (angular) {
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
         vm.profile = data[0].profile;
-
     };
 
     InfoRequestCtrl.prototype.placeBid = function(index){
@@ -167,8 +166,9 @@ define(['angular'], function (angular) {
                 vm.toastr.error(data);
             }
         });
-    }
-    function HomeCtrl(ResourceService, data, localStorageService, toastr)
+    };
+    
+    function HomeCtrl($location, ResourceService, data, localStorageService,toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
@@ -176,10 +176,10 @@ define(['angular'], function (angular) {
         vm.toastr = toastr;
         vm.type = localStorageService.get('type');
 
-        vm.request = data[0].requests;
+        vm.requests = data[0].requests;
         vm.bids = data[1].bids;
-    };
-
+        vm.$location = $location;
+    }
     HomeCtrl.prototype.updatePerson = function(index, modify)
     {
         var vm = this;
@@ -249,6 +249,12 @@ define(['angular'], function (angular) {
             }
         });
     };
+
+    HomeCtrl.prototype.showProfile = function(request)
+    {
+        var vm = this;
+        vm.$location.path('/profile');
+    }
 
     function PersonCtrl(ResourceService, toastr) {
         var vm = this;
