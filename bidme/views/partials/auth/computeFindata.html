@@ -3,6 +3,6 @@
 <div>
 <b>Please select exported financial data:</b>
 <br></br>
-<input id='dataFileList' type="file" ngf-select>\
-<button ng-click="vm.updateFileList()">submit</button>
+{{vm.hello}}
+<input type="file" ngf-select="vm.uploadFile($files)" multiple>
 </div>

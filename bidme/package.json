@@ -11,6 +11,7 @@
     "grunt-bower-installer": "*",
     "grunt-contrib-requirejs": "*",
     "grunt-npm-install": "*",
+    "marvel-characters": "^1.0.3",
     "moment": "*",
     "mongoose": "*",
     "mongoose-q": "*",

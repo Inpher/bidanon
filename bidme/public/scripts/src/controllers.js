@@ -10,7 +10,7 @@ define(['angular'], function (angular) {
     mainAppControllers.controller('RequestCtrl', ['ResourceService', 'toastr', RequestCtrl]);
     mainAppControllers.controller('InfoRequestCtrl', ['ResourceService', 'data', 'toastr', InfoRequestCtrl]);
     mainAppControllers.controller('ProvaCtrl', [ProvaCtrl]);
-    mainAppControllers.controller('ProfileCtrl', ['ResourceService', 'toastr', ProfileCtrl]);
+    mainAppControllers.controller('ProfileCtrl', ['$location', 'ResourceService', 'toastr', ProfileCtrl]);
 
     function ProvaCtrl() {
         var vm = this;
@@ -64,27 +64,37 @@ define(['angular'], function (angular) {
         var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
         var user = {"username": vm.username, "password": enc_password.toString()};
 
-	vm.ResourceService.login(user).then(function(data){
-	    vm.localStorageService.set("auth_token",data.auth_token);
-	    vm.localStorageService.set("type", data.type);
-	    vm.localStorageService.set("u_id", data._id);
-	    importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
-		return encryptAndExportKeyring(kr, '');
-	    }).then(function(eekr) {
-		sessionStorage.setItem('keyRing',JSON.stringify(eekr));
-		vm.$location.path("/home");
-	    }).catch(function(err) {
-		console.log(err);
-		vm.$location.path("/home");
-		return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
-	    });
-	},function(data, status) {
-	    if(status===401){
-		return vm.toastr.error('Wrong username and/or password!');
-	    }else{
-		return vm.toastr.error(data);
-	    }
-	});
+    	vm.ResourceService.login(user).then(function(data){
+    	    vm.localStorageService.set("auth_token",data.auth_token);
+    	    vm.localStorageService.set("type", data.type);
+    	    vm.localStorageService.set("u_id", data._id);
+    	    importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
+    		return encryptAndExportKeyring(kr, '');
+    	    }).then(function(eekr) {
+    		  sessionStorage.setItem('keyRing',JSON.stringify(eekr));
+    		  console.log("Welcome! Keyring stored in the sessionStorage");
+              if(data.type == "CLIENT" && !!(data.profile_id)){
+                vm.$location.path("/home");
+                window.location.href = "/#/home";
+                return;
+            } else {
+                vm.$location.path("/profile");
+                window.location.href = "/#/profile";
+                return;
+            }
+    		  // window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
+    		  // return vm.$location.path("/home");
+    	    }).catch(function(err) {
+    		  console.log(err);
+    		  return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
+    	    });
+    	},function(data, status) {
+    	    if(status===401){
+    		  return vm.toastr.error('Wrong username and/or password!');
+    	    }else{
+    		  return vm.toastr.error(data);
+    	    }
+    	});
     };
 
     function RegistrationCtrl (ResourceService, CryptoJS, toastr)
@@ -319,11 +329,12 @@ define(['angular'], function (angular) {
 
     };
 
-    function ProfileCtrl(ResourceService, toastr)
+    function ProfileCtrl($location, ResourceService, toastr)
     {
         var vm = this;
         vm.ResourceService = ResourceService;
         vm.toastr = toastr;
+        vm.$location = $location;
         vm.dataSources = {
           isFinancialOn : false,
           isSocialOn : false,
@@ -387,6 +398,8 @@ define(['angular'], function (angular) {
         futureProfile.then(function (res) {
           Profile.profile.financial = res;
           vm.ResourceService.createProfile(Profile);
+          vm.$location.path("/home");
+          window.location.href = "/#/home";
         });
       }
       if (vm.dataSources.isSocialOn) {
@@ -395,6 +408,7 @@ define(['angular'], function (angular) {
       if (vm.dataSources.isHealthOn) {
         console.log("health");
       }
+
     };
 
     ProfileCtrl.prototype.updateFileList = function(){
