@@ -56,29 +56,35 @@ define(['angular'], function (angular) {
     LoginCtrl.prototype.submit = function()
     {
         var vm = this;
+	if(vm.username===undefined || vm.password ===undefined){
+            return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
+	}
+
         var salt = vm.username;
         var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-
         var user = {"username": vm.username, "password": enc_password.toString()};
 
-        if(vm.username!==undefined || vm.password !==undefined){
-
-            vm.ResourceService.login(user).then(function(data){
-                vm.localStorageService.set("auth_token",data.auth_token);
-                vm.localStorageService.set("type", data.type);
-                vm.localStorageService.set("u_id", data._id);
-                vm.$location.path("/home");
-            },function(data, status) {
-                if(status===401){
-                    vm.toastr.error('Wrong username and/or password!');
-                }else{
-                    vm.toastr.error(data);
-                }
-            });
-
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
-        }
+	vm.ResourceService.login(user).then(function(data){
+	    vm.localStorageService.set("auth_token",data.auth_token);
+	    vm.localStorageService.set("type", data.type);
+	    vm.localStorageService.set("u_id", data._id);
+	    importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
+		return encryptAndExportKeyring(kr, '');
+	    }).then(function(eekr) {
+		sessionStorage.setItem('keyRing',JSON.stringify(eekr));
+		vm.$location.path("/home");
+	    }).catch(function(err) {
+		console.log(err);
+		vm.$location.path("/home");
+		return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
+	    });
+	},function(data, status) {
+	    if(status===401){
+		return vm.toastr.error('Wrong username and/or password!');
+	    }else{
+		return vm.toastr.error(data);
+	    }
+	});
     };
 
     function RegistrationCtrl (ResourceService, CryptoJS, toastr)
@@ -91,30 +97,35 @@ define(['angular'], function (angular) {
 
     RegistrationCtrl.prototype.signup = function()
     {
-        var vm = this;
-        var salt = vm.username;
+	var vm = this;
+        if(vm.username===undefined || vm.password===undefined){
+	    return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+	}
+	if(vm.password !== vm.check_password){
+	    return vm.toastr.warning('password and check_password must be the same!');
+	}
+	//generate a keyring
+	generateEncryptAndExportKeyring(vm.password).then(function(ekr) {
+	    var salt = vm.username;
+	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+	    var user = { 
+		"username": vm.username, 
+		"password": enc_password.toString(), 
+		"type": "CLIENT", 
+		"encKeyRing": ekr,
+	    };
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "type": "CLIENT", "check_password" : enc_check_password.toString() };
-
-        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
-            if(vm.password !== vm.check_password){
-                vm.toastr.warning('password and check_password must be the same!');
-            }else{
-                vm.ResourceService.signup(user).then(function(){
-                    vm.toastr.success('User successfully registered!');
-                    vm.username = null;
-                    vm.password = null;
-                    vm.check_password = null;
-                },function(data) {
-                    vm.toastr.error(data.message);
-                });
-            }
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
-        }
+	    return vm.ResourceService.signup(user);
+	}).then(function() {
+	    vm.toastr.success('User successfully registered!');
+	    vm.username = null;
+	    vm.password = null;
+	    vm.check_password = null;
+	},function(data) {
+	    console.log(data);
+	    vm.toastr.error(data.message);
+	});
     };
 
     RegistrationCtrl.prototype.signupBank = function()
