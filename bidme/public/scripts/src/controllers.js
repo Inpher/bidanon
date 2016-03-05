@@ -381,6 +381,7 @@ define(['angular'], function (angular) {
     ProfileCtrl.prototype.createProfile = function()
     {
       var vm = this;
+      var counter = 0;
       var Profile = {
         profile : {
           financial: null,
@@ -392,22 +393,30 @@ define(['angular'], function (angular) {
       console.log("Get the user profile");
       console.log(vm.dataSources)
       if (vm.dataSources.isFinancialOn) {
-        console.log("financial");
         //Profile.profile.financial = vm.updateFileList();
         var futureProfile = vm.updateFileList();
         futureProfile.then(function (res) {
           Profile.profile.financial = res;
           vm.ResourceService.createProfile(Profile);
-          vm.$location.path("/home");
-          window.location.href = "/#/home";
+          gohome();
         });
-      }
+      } else { gohome(); }
       if (vm.dataSources.isSocialOn) {
         console.log("social");
-      }
+        gohome();
+      } else { gohome(); }
       if (vm.dataSources.isHealthOn) {
         console.log("health");
-      }
+        gohome();
+      } else { gohome(); }
+
+      function gohome() {
+          counter ++;
+          if (counter == 3) {
+            vm.$location.path("/home");
+            window.location.href = "/#/home";
+          }
+      };
 
     };
 
