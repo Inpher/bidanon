@@ -334,12 +334,39 @@ define(['angular'], function (angular) {
         };
     }
 
-    function computeFinProfile()
+
+    function computeFinScore(avgIncome,avgSpendings){
+    // Heuristics: We could easily hook up census open data to
+    // compute a meaningful statistical score
+      var score = 0.;
+      if((avgIncome != 0) || (avgSpendings != 0)){
+        var score = avgIncome/(avgIncome - avgSpendings);
+      }
+      return score;
+    }
+
+    function computeFinProfile(text)
     {
+      // Parse JSON
+      var trans = $.parseJSON(text)
+
+      // I hope we get some bonus for some nice lambda function in javascript
+      // Get the sum of all positive transactions
+      var pos = trans.filter(function(current){return current.details.value.amount > 0})
+        .reduce(function(sum,current){ return sum + parseFloat(current.details.value.amount)},0);
+      // Get the sum of all negative transactions
+      var neg = trans.filter(function(current){return current.details.value.amount < 0})
+        .reduce(function(sum,current){ return sum + parseFloat(current.details.value.amount)},0);
+
+      // Git first and last timestamp
+      var firstTimestamp = trans.reduce(function(min, current){ return Math.min(min,Date.parse(current.details.completed)) }, Date.parse(trans[0].details.completed));
+      var lastTimestamp = trans.reduce(function(max, current){ return Math.max(max,Date.parse(current.details.completed)) }, Date.parse(trans[0].details.completed));
+      var timeSpan = (lastTimestamp - firstTimestamp)/(Date.parse("Sept 12 2016")-Date.parse("Aug 12 2016"));
+
       return {
-        score: 82,
-        avgIncome: 9000,
-        avgSpendings: 2000,
+        score: computeFinScore(avgIncome,avgSpendings),
+        avgIncome: pos/timeSpan,
+        avgSpendings: neg/timeSpan,
       };
     }
 
@@ -373,7 +400,6 @@ define(['angular'], function (angular) {
     function ComputeFinDataScoreCtrl(ResourceService, toastr)
     {
 	   var vm = this;
-	   vm.hello='HelloWorld';
       vm.finProfile = {
         score : 94,
         avgIncome : 9000,
@@ -382,30 +408,19 @@ define(['angular'], function (angular) {
     }
 
     ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
-      vm.finProfile = {
-        score : 94,
-        avgIncome : 9000,
-        avgSpendings : 3000,
-      };
-
-      console.log("test");
       var vm = this;
+      var fileList = $('#dataFileList').prop('files');
       var reader = new FileReader();
 
-      reader.onload = function(e) {
-       var text = reader.result;
+      var file = fileList.item(0);
+
+      reader.onloadend = function(e) {
+        var text = reader.result;
+        computeFinProfile(text);
       }
 
-      for (var i = 0; i < files.files.length; i++) {
-        var file = files.files[i];
-        reader.readAsText(file);
-        console.log(file);
-        console.log(reader);
-      }
+      reader.readAsText(file);
     }
 
-
-
     return mainAppControllers;
-
 });
