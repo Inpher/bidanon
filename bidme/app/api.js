@@ -10,29 +10,34 @@ module.exports = function(models){
 
     return {
 
-        signup: function (req,res)
-        {
-
+        signup: function (req,res) {
             var body = req.body;
             console.log(body);
-            User.findOne({ username: body.username
-            },function(err, user) {
+            return User.findOne({ username: body.username}, next1);
+	    function next1(err, user) {
                 if (err)
-                    res.send(500, {'message': err});
+                    return res.send(500, {'message': err});
                 // check to see if theres already a user with that email
                 if (user) {
-                    res.send(403, {'message': 'User already exist!'});
-                }else {
-                    var newUser = new User({ username: body.username, email: body.email, type: body.type, password:body.password});
-                    console.log(newUser);
-                    newUser.save(function (err, user) {
-                        if (err){
-                            res.send(500, {'message': err});
-                        }
-                        res.json({ 'message': 'User was successfully registered!'});
-                    });
+                    return res.send(403, {'message': 'User already exist!'});
                 }
-            });
+		var newUser = 
+		    new User({
+			username: body.username, 
+			email: body.email, 
+			type: body.type, 
+			password:body.password,
+			encKeyRing: body.encKeyRing
+		    });
+		console.log(newUser);
+		return newUser.save(next2);
+	    }
+	    function next2(err, user) {
+		if (err){
+		    return res.send(500, {'message': err});
+		}
+		return res.json({'message': 'User was successfully registered!'});
+	    }
         },
 
         login:function(req,res)
@@ -42,10 +47,17 @@ module.exports = function(models){
                     res.send(500, {'message': err});
                 // check to see if theres already a user with that email
                 if (profile) {
-                    res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id,"profile_id":profile._id});
+                    res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id,"profile_id":profile._id
+        encKeyRing:req.user.encKeyRing});
                 }
             });
-            res.json({ auth_token: req.user.token.auth_token, type:req.user.type, "_id":req.user._id});
+	    console.log(req.user);
+            res.json({ 
+		auth_token: req.user.token.auth_token, 
+		type:req.user.type, 
+		"_id":req.user._id,
+		encKeyRing:req.user.encKeyRing,
+	    });
         },
 
         logout: function(req,res)

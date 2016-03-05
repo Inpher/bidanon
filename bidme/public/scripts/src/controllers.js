@@ -57,33 +57,41 @@ define(['angular'], function (angular) {
     LoginCtrl.prototype.submit = function()
     {
         var vm = this;
+	if(vm.username===undefined || vm.password ===undefined){
+            return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
+	}
+
         var salt = vm.username;
         var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-
         var user = {"username": vm.username, "password": enc_password.toString()};
 
-        if(vm.username!==undefined || vm.password !==undefined){
-
-            vm.ResourceService.login(user).then(function(data){
-                vm.localStorageService.set("auth_token",data.auth_token);
-                vm.localStorageService.set("type", data.type);
-                vm.localStorageService.set("u_id", data._id);
-                if(data.type == "CLIENT" && data.profile_id){
-                    vm.$location.path("/profile");
-                } else {
-                    vm.$location.path("/home");
-                }
-            },function(data, status) {
-                if(status===401){
-                    vm.toastr.error('Wrong username and/or password!');
-                }else{
-                    vm.toastr.error(data);
-                }
-            });
-
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
-        }
+    	vm.ResourceService.login(user).then(function(data){
+    	    vm.localStorageService.set("auth_token",data.auth_token);
+    	    vm.localStorageService.set("type", data.type);
+    	    vm.localStorageService.set("u_id", data._id);
+    	    importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
+    		return encryptAndExportKeyring(kr, '');
+    	    }).then(function(eekr) {
+    		sessionStorage.setItem('keyRing',JSON.stringify(eekr));
+    		console.log("Welcome! Keyring stored in the sessionStorage");
+    		window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
+    		return vm.$location.path("/home");
+    	    }).catch(function(err) {
+    		console.log(err);
+            if(data.type == "CLIENT" && data.profile_id){
+                vm.$location.path("/profile");
+            } else {
+                vm.$location.path("/home");
+            }
+    		return vm.toastr.error('Failed to decrypt the keyring (ignoring, for now [TODO])!');
+    	    });
+    	},function(data, status) {
+    	    if(status===401){
+    		return vm.toastr.error('Wrong username and/or password!');
+    	    }else{
+    		return vm.toastr.error(data);
+    	    }
+    	});
     };
 
     function RegistrationCtrl (ResourceService, CryptoJS, toastr)
@@ -96,58 +104,68 @@ define(['angular'], function (angular) {
 
     RegistrationCtrl.prototype.signup = function()
     {
-        var vm = this;
-        var salt = vm.username;
+	var vm = this;
+        if(vm.username===undefined || vm.password===undefined){
+	    return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+	}
+	if(vm.password !== vm.check_password){
+	    return vm.toastr.warning('password and check_password must be the same!');
+	}
+	//generate a keyring
+	generateEncryptAndExportKeyring(vm.password).then(function(ekr) {
+	    var salt = vm.username;
+	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+	    var user = { 
+		"username": vm.username, 
+		"password": enc_password.toString(), 
+		"type": "CLIENT", 
+		"encKeyRing": ekr,
+	    };
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "type": "CLIENT", "check_password" : enc_check_password.toString() };
-
-        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
-            if(vm.password !== vm.check_password){
-                vm.toastr.warning('password and check_password must be the same!');
-            }else{
-                vm.ResourceService.signup(user).then(function(){
-                    vm.toastr.success('User successfully registered!');
-                    vm.username = null;
-                    vm.password = null;
-                    vm.check_password = null;
-                },function(data) {
-                    vm.toastr.error(data.message);
-                });
-            }
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
-        }
+	    return vm.ResourceService.signup(user);
+	}).then(function() {
+	    vm.toastr.success('User successfully registered!');
+	    vm.username = null;
+	    vm.password = null;
+	    vm.check_password = null;
+	},function(data) {
+	    console.log(data);
+	    vm.toastr.error(data.message);
+	});
     };
 
     RegistrationCtrl.prototype.signupBank = function()
     {
-        var vm = this;
-        var salt = vm.username;
+	var vm = this;
+        if(vm.username===undefined || vm.password===undefined){
+	    return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
+	}
+	if(vm.password !== vm.check_password){
+	    return vm.toastr.warning('password and check_password must be the same!');
+	}
+	//generate a keyring
+	generateEncryptAndExportKeyring(vm.password).then(function(ekr) {
+	    var salt = vm.username;
+	    var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 
-        var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
-        var enc_check_password = CryptoJS.PBKDF2(vm.check_password, salt, { keySize: 256/32 });
+	    var user = { 
+		"username": vm.username, 
+		"password": enc_password.toString(), 
+		"type": "BANK", 
+		"encKeyRing": ekr,
+	    };
 
-        var user = {"username": vm.username, "password": enc_password.toString(), "type": "BANK", "check_password" : enc_check_password.toString() };
-        console.log(user);
-        if(vm.username!==undefined || vm.password !==undefined || vm.check_password !==undefined){
-            if(vm.password !== vm.check_password){
-                vm.toastr.warning('password and check_password must be the same!');
-            }else{
-                vm.ResourceService.signup(user).then(function(){
-                    vm.toastr.success('User successfully registered!');
-                    vm.username = null;
-                    vm.password = null;
-                    vm.check_password = null;
-                },function(data) {
-                    vm.toastr.error(data.message);
-                });
-            }
-        }else{
-            noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'warning'});
-        }
+	    return vm.ResourceService.signup(user);
+	}).then(function() {
+	    vm.toastr.success('User successfully registered!');
+	    vm.username = null;
+	    vm.password = null;
+	    vm.check_password = null;
+	},function(data) {
+	    console.log(data);
+	    vm.toastr.error(data.message);
+	});
     };
 
     
@@ -321,12 +339,39 @@ define(['angular'], function (angular) {
         };
     }
 
-    function computeFinProfile()
+
+    function computeFinScore(avgIncome,avgSpendings){
+    // Heuristics: We could easily hook up census open data to
+    // compute a meaningful statistical score
+      var score = 0.;
+      if((avgIncome != 0) || (avgSpendings != 0)){
+        var score = avgIncome/(avgIncome - avgSpendings);
+      }
+      return score;
+    }
+
+    function computeFinProfile(text)
     {
+      // Parse JSON
+      var trans = $.parseJSON(text)
+
+      // I hope we get some bonus for some nice lambda function in javascript
+      // Get the sum of all positive transactions
+      var pos = trans.filter(function(current){return current.details.value.amount > 0})
+        .reduce(function(sum,current){ return sum + parseFloat(current.details.value.amount)},0);
+      // Get the sum of all negative transactions
+      var neg = trans.filter(function(current){return current.details.value.amount < 0})
+        .reduce(function(sum,current){ return sum + parseFloat(current.details.value.amount)},0);
+
+      // Git first and last timestamp
+      var firstTimestamp = trans.reduce(function(min, current){ return Math.min(min,Date.parse(current.details.completed)) }, Date.parse(trans[0].details.completed));
+      var lastTimestamp = trans.reduce(function(max, current){ return Math.max(max,Date.parse(current.details.completed)) }, Date.parse(trans[0].details.completed));
+      var timeSpan = (lastTimestamp - firstTimestamp)/(Date.parse("Sept 12 2016")-Date.parse("Aug 12 2016"));
+
       return {
-        score: 82,
-        avgIncome: 9000,
-        avgSpendings: 2000,
+        score: computeFinScore(avgIncome,avgSpendings),
+        avgIncome: pos/timeSpan,
+        avgSpendings: neg/timeSpan,
       };
     }
 
@@ -361,7 +406,6 @@ define(['angular'], function (angular) {
     function ComputeFinDataScoreCtrl(ResourceService, toastr)
     {
 	   var vm = this;
-	   vm.hello='HelloWorld';
       vm.finProfile = {
         score : 94,
         avgIncome : 9000,
@@ -370,30 +414,19 @@ define(['angular'], function (angular) {
     }
 
     ComputeFinDataScoreCtrl.prototype.updateFileList = function(files){
-      vm.finProfile = {
-        score : 94,
-        avgIncome : 9000,
-        avgSpendings : 3000,
-      };
-
-      console.log("test");
       var vm = this;
+      var fileList = $('#dataFileList').prop('files');
       var reader = new FileReader();
 
-      reader.onload = function(e) {
-       var text = reader.result;
+      var file = fileList.item(0);
+
+      reader.onloadend = function(e) {
+        var text = reader.result;
+        computeFinProfile(text);
       }
 
-      for (var i = 0; i < files.files.length; i++) {
-        var file = files.files[i];
-        reader.readAsText(file);
-        console.log(file);
-        console.log(reader);
-      }
+      reader.readAsText(file);
     }
 
-
-
     return mainAppControllers;
-
 });
