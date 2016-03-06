@@ -36,6 +36,7 @@ define(['angular'], function (angular) {
 	{
 		var vm = this;
 		vm.localStorageService.clearAll();
+		deleteKeyringFromTheSession();
 		vm.$location.path("/login");
 	};
 
@@ -60,6 +61,7 @@ define(['angular'], function (angular) {
 			return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
 	}
 
+		deleteKeyringFromTheSession();
 		var salt = vm.username;
 		var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 		var user = {"username": vm.username, "password": enc_password.toString()};
@@ -69,20 +71,17 @@ define(['angular'], function (angular) {
 			vm.localStorageService.set("type", data.type);
 			vm.localStorageService.set("u_id", data._id);
 			importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
-			return encryptAndExportKeyring(kr, '');
-			}).then(function(eekr) {
-			  sessionStorage.setItem('keyRing',JSON.stringify(eekr));
-			  console.log("Welcome! Keyring stored in the sessionStorage");
-			  if((data.type == 'BANK') ||
-				(data.type == "CLIENT" && data.profile_id)){
+			    saveKeyringInTheSession(kr);
+			    if((data.type == 'BANK') ||
+				    (data.type == "CLIENT" && data.profile_id)){
 				vm.$location.path("/home");
 				window.location.href = "/#/home";
 				return;
-			} else {
+			    } else {
 				vm.$location.path("/profile");
 				window.location.href = "/#/profile";
 				return;
-			}
+			    }
 			  // window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
 			  // return vm.$location.path("/home");
 			}).catch(function(err) {
@@ -351,6 +350,7 @@ define(['angular'], function (angular) {
 		  isSocialOn : false,
 		  isHealthOn : false,
 		};
+		vm.social = 0;
 	}
 
 
@@ -397,7 +397,7 @@ define(['angular'], function (angular) {
 	  var Profile = {
 		profile : {
 		  financial: null,
-		  social: null,
+		  social: vm.social,
 		  health: null,
 		}
 	  };
@@ -429,7 +429,7 @@ define(['angular'], function (angular) {
 			window.location.href = "/#/home";
 		  }
 	  };
-
+		console.log(Profile);
 	};
 
 	ProfileCtrl.prototype.updateFileList = function(){
@@ -451,6 +451,47 @@ define(['angular'], function (angular) {
 	  })
 
 	  return promise;
+	}
+
+	ProfileCtrl.prototype.fbLogin = function(){
+		var vm = this;
+		var socialscore = 0
+
+		// Login
+		FB.login(function(response) {
+			console.log('Login Status', response);
+		}, {scope: 'email,user_likes,user_friends,user_education_history,user_work_history'});
+
+		// Check login status
+		FB.getLoginStatus(function(response) {
+			console.log('Login Status', response);
+			if (response.status === 'connected') {
+				// Actual graph api request
+				FB.api('/me?fields=languages,education,work,age_range', function(response) {
+					console.log('API response', response);
+					var education = 0
+					for (var i = 0; i < response.education.length; i++) {
+						if (response.education[i].type == "College"){
+							education += 30;
+						}
+						if (response.education[i].type == "Graduate School"){
+							education += 50;
+						}
+						if (response.education[i].type == "High School"){
+							education += 10;
+						}
+					}
+					var prof = response.work.length * 20;
+					var socialscore = (education*0.4 + prof*0.5 + response.age_range.min*0.1);
+					console.log("Social:"+socialscore);
+					vm.social = socialscore;
+				});
+			}
+		});
+	}
+
+	function fbComputeScore(){
+
 	}
 
 	return mainAppControllers;

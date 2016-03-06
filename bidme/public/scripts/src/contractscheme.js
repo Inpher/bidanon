@@ -1,4 +1,5 @@
 var crypto = window.crypto || window.msCrypto;
+var keyRing = null;
 
 if (crypto && !crypto.subtle && crypto.webkitSubtle) {
 	crypto.subtle = crypto.webkitSubtle;
@@ -344,4 +345,69 @@ function testEverything() {
 	console.log('decrypt');
 	console.log(text);
     });
+}
+
+
+function deleteKeyringFromTheSession() {
+    keyRing = null;
+    sessionStorage.removeItem('keyRing');
+}
+
+function saveKeyringInTheSession(kr) {
+    keyRing = kr;
+    encryptAndExportKeyring(kr,'').then(function(ekr) {
+	sessionStorage.setItem('keyRing',JSON.stringify(ekr));
+	console.log("Welcome! Keyring stored in the sessionStorage");
+    });
+}
+
+function loadKeyringFromTheSession() {
+    var ekr = sessionStorage.getItem('keyRing');
+    if (ekr==null) {
+	return console.log("Error getting the keyring from the session");
+    }
+    importAndDecryptKeyring(JSON.parse(ekr), '').then(function(kr) {
+	keyRing=kr;
+    });
+}
+
+function getKeyringFromTheSession() {
+    return new Promise(function(resolve, reject){
+	if (keyRing!=null) return resolve(keyRing);
+	var ekr = sessionStorage.getItem('keyRing');
+	if (ekr==null) {
+	    console.log("Error getting the keyring from the session");
+	    return reject("Error getting the keyring from the session");
+	}
+	importAndDecryptKeyring(JSON.parse(ekr), '').then(function(kr) {
+	    keyRing=kr;
+	    return resolve(kr);
+	});
+    });
+}
+
+function createAndSignContract(publicData, keyRing) {
+	// assume extracted from the database 
+	var privateDataBorrower = { name:"John Smith" , age:30 , address:"330N Southcreek Rd., Mississauga, ON, Canada" };
+	var privateDataLender = { bank:"The Missisauga Food Bank" , address:"3121 Universal Dr., Mississauga, ON, Canada" };
+	var loanAmount = publicData["loanAmount"];
+	var interestRate = publicData["interestRate"];
+	var maturity = publicData["maturity"]; 
+
+	return new Promise(function(resolve, reject) {
+		var contractString = { 
+			"publicData": publicData, 
+			"privateDataBorrower": privateDataBorrower, 
+			"privateDataLender": privateDataLender 
+		}; 
+		// sign the current contract string and add signature to the contract 
+		getKeyringFromTheSession().then( function(keyRing) {
+			return sign(contractString, keyRing.skeySign); 	
+		}).then( function(sig) {
+			contractString["borrowerSignature"] = sig; 
+			return resolve(contractString); 
+		}).catch(function (err) {
+	    	return reject(err);
+		}); 
+	});  
 }
