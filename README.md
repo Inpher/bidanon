@@ -57,6 +57,11 @@ $PROJECT_HOME/client-data/findata/
 ```
 The data is pulled from the [OpenBank](https://openbankproject.com/) project. The score is currently computed based on simple heuristics but with a large sample size of users we could create more detailed statistics regarding the financial capabilities of the user and match it with other census data such as average income for a country/region.
 
+The following script shows a PoC how this data could be accessed from the app itself and not by uploading a file through the OpenBank rest api.
+```
+$PROJECT_HOME/retrieveTransactions.py
+```
+
 ## Social Score
 Using the facebook graph API. The score is again calculated based on some heuristics of the following parameters:
 - Age
