@@ -386,28 +386,91 @@ function getKeyringFromTheSession() {
     });
 }
 
-function createAndSignContract(publicData, keyRing) {
+function createAndSignContract(publicData, keyRing, lenderPKey) {
 	// assume extracted from the database 
-	var privateDataBorrower = { name:"John Smith" , age:30 , address:"330N Southcreek Rd., Mississauga, ON, Canada" };
-	var privateDataLender = { bank:"The Missisauga Food Bank" , address:"3121 Universal Dr., Mississauga, ON, Canada" };
-	var loanAmount = publicData["loanAmount"];
+	var privateDataBorrower = { 
+		name:"John Smith" , 
+		age:30 , 
+		address:"330N Southcreek Rd., Mississauga, ON, Canada" 
+	};
+	var privateDataLender = { 
+		bank:"The Missisauga Food Bank" , 
+		address:"3121 Universal Dr., Mississauga, ON, Canada" 
+	};
+	var loanAmount = publicData["amount"];
 	var interestRate = publicData["interestRate"];
 	var maturity = publicData["maturity"]; 
+	var borrowerId = publicData["borrower_id"];
+	var lenderId = publicData["lender_id"];
 
 	return new Promise(function(resolve, reject) {
-		var contractString = { 
-			"publicData": publicData, 
-			"privateDataBorrower": privateDataBorrower, 
+		var privateInfo = { 
+			"privateDataBorrower": privateDataBorrower,  
 			"privateDataLender": privateDataLender 
-		}; 
-		// sign the current contract string and add signature to the contract 
+		};
+
 		getKeyringFromTheSession().then( function(keyRing) {
-			return sign(contractString, keyRing.skeySign); 	
-		}).then( function(sig) {
-			contractString["borrowerSignature"] = sig; 
-			return resolve(contractString); 
+			var contractData = { 
+				"publicInfo": publicData, 
+				"encPrivateInfo": "", // this must be encrypted
+				"formattedContent": "",
+				"borrowerEncKey": "",
+				"lenderEncKey": "",
+				"borrowerSignature": "", 
+				"lenderSignature": "", 
+			};
+			// compute encrypted private info as a string 
+			var privateInfoStr = JSON.stringify(privateInfo);
+			return encrypt(privateInfoStr, keyRing.pkeyEncrypt);
+		}).then( function(ct) {
+			contractData["encPrivateInfo"] = ct["ct"];
+			contractData["borrowerEncKEy"] = ct["enckey"];
+			return reencryptSessionKey(ct["enckey"], keyRing.skeyEncrypt, lenderPKey); 
+		};).then(function(lenderEncKey) {
+			contractData["lenderEncKey"] = lenderEncKey; 
+			// formatted content 
+			var formattedContent = JSON.stringify({
+				publicInfo: publicData,
+				encPrivateInfo: contractData["encPrivateInfo"]; 
+			});
+			contractData["formattedContent"] = formattedContent; 
+			return sign(contractString, keyRing.skeySign);	  				
+		};).then( function(sig) {
+			contractData["borrowerSignature"] = sig; 
+			return resolve(contractData); 
 		}).catch(function (err) {
 	    	return reject(err);
+		});  
+	});
+}
+
+function decryptPrivateInfo(contractData) {
+	// TODO: contract data should not contain publicInfo and formattedInfo - 
+	//       these can be recalculated by the server and the client too. 
+	return new Promise(function(resolve, reject) {
+		var endPrivateInfo = contractData["encPrivateInfo"];
+		getKeyringFromTheSession().then( function(keyRing) {
+			var ct = { "ct":encPrivateInfo, "enckey":contractData["lenderEncKey"] }; 
+			// decrypt private info 
+			return decrypt(ct, keyRing.skeyEncrypt);
+		}).then(function(ptext) {
+			return resolve(JSON.parse(ptext)); 
+		}).catch(function(err) {
+			return reject(err); 
 		}); 
-	});  
+	}); 
+}
+
+function lenderSign(contractData) {
+	return new Promise(function(resolve, reject) {
+		var formattedContent = contractData["formattedContent"];
+		getKeyringFromTheSession().then( function(keyRing) { 
+			return sign(formattedContent, keyRing.skeySign);
+		}).then(function(sig) {
+			contractData["lenderSignature"] = sig; 
+			return resolve(contractData); 
+		}).catch(function(err) {
+			return reject(err); 
+		}); 
+	});	
 }
