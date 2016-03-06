@@ -92,5 +92,7 @@ Using the facebook graph API. The score is again calculated based on some heuris
 - Education
 - Work
 
+# Future work and improvements
+
 ## Decentralized Trading Platform for Loan Contracts 
 Once the contract has been created, it can be traded between borrowers or lenders (as bonds are traded) in a decentralized way using blockchains. Suppose that a borrower has a mortgage contract (with a loan amount or "par value") and a maturity date. If that borrower wants to sell the loan contract to another borrower without going through a centralized brokerage scheme, one can represent the loan contract via Ethereum smart contract and securely change the ownership of the contract (the borrower). The contract buyer could then pay with cryptographic currency (bitcoin), again in a decentralized manner.      
