@@ -203,10 +203,10 @@ module.exports = function(models){
           var profile = req.body.profile;
           var newProfile = new PublicProfile({
             name: marvel(),
-            avgMonthlyIncome :100000, //profile.financial.avgIncome,
-            avgMonthlySpendings : 90000,//profile.financial.avgSpendings,
+            avgMonthlyIncome : profile.financial.avgIncome,
+            avgMonthlySpendings : profile.financial.avgSpendings,
             desc : "hello world I am cool",
-            score : 5,//profile.financial.score,
+            score : profile.financial.score,
             u_id : req.user.id,
           });
           PublicProfile.update(
