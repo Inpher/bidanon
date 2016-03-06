@@ -402,6 +402,8 @@ function createAndSignContract(publicData, lenderPKey) {
 	var maturity = publicData["maturity"]; 
 	var borrowerId = publicData["borrower_id"];
 	var lenderId = publicData["lender_id"];
+	var contractData; 
+	var formattedContent; 
 
 	return new Promise(function(resolve, reject) {
 		var privateInfo = { 
@@ -410,31 +412,27 @@ function createAndSignContract(publicData, lenderPKey) {
 		};
 
 		getKeyringFromTheSession().then( function(keyRing) {
-			var contractData = { 
-				"publicInfo": publicData, 
-				"encPrivateInfo": "", // this must be encrypted
+			contractData = { 
 				"formattedContent": "",
 				"borrowerEncKey": "",
 				"lenderEncKey": "",
 				"borrowerSignature": "", 
-				"lenderSignature": "", 
+				"lenderSignature": null, 
 			};
 			// compute encrypted private info as a string 
 			var privateInfoStr = JSON.stringify(privateInfo);
 			return encrypt(privateInfoStr, keyRing.pkeyEncrypt);
 		}).then( function(ct) {
-			contractData["encPrivateInfo"] = ct["ct"];
+			formattedContent["publicInfo"] = publicData;
+			formattedContent["encPrivateInfo"] = ct["ct"];
 			contractData["borrowerEncKEy"] = ct["enckey"];
 			return reencryptSessionKey(ct["enckey"], keyRing.skeyEncrypt, lenderPKey); 
 		}).then(function(lenderEncKey) {
 			contractData["lenderEncKey"] = lenderEncKey; 
 			// formatted content 
-			var formattedContent = JSON.stringify({
-				publicInfo: publicData,
-				encPrivateInfo: contractData["encPrivateInfo"] 
-			});
+			formattedContentStr = JSON.stringify(formattedContent);
 			contractData["formattedContent"] = formattedContent; 
-			return sign(contractString, keyRing.skeySign);	  				
+			return sign(contractStringStr, keyRing.skeySign);	  				
 		}).then( function(sig) {
 			contractData["borrowerSignature"] = sig; 
 			return resolve(contractData); 
