@@ -386,7 +386,7 @@ function getKeyringFromTheSession() {
     });
 }
 
-function createAndSignContract(publicData, keyRing, lenderPKey) {
+function createAndSignContract(publicData, lenderPKey) {
 	// assume extracted from the database 
 	var privateDataBorrower = { 
 		name:"John Smith" , 
