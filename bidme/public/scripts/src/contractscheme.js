@@ -403,7 +403,7 @@ function createAndSignContract(publicData, lenderPKey) {
 	var borrowerId = publicData["borrower_id"];
 	var lenderId = publicData["lender_id"];
 	var contractData; 
-	var formattedContent; 
+	var formattedContent = {}; 
 
 	return new Promise(function(resolve, reject) {
 		var privateInfo = { 
