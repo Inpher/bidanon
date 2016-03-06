@@ -386,7 +386,7 @@ function getKeyringFromTheSession() {
     });
 }
 
-function createAndSignContract(publicData, keyRing, lenderPKey) {
+function createAndSignContract(publicData, lenderPKey) {
 	// assume extracted from the database 
 	var privateDataBorrower = { 
 		name:"John Smith" , 
@@ -426,16 +426,16 @@ function createAndSignContract(publicData, keyRing, lenderPKey) {
 			contractData["encPrivateInfo"] = ct["ct"];
 			contractData["borrowerEncKEy"] = ct["enckey"];
 			return reencryptSessionKey(ct["enckey"], keyRing.skeyEncrypt, lenderPKey); 
-		};).then(function(lenderEncKey) {
+		}).then(function(lenderEncKey) {
 			contractData["lenderEncKey"] = lenderEncKey; 
 			// formatted content 
 			var formattedContent = JSON.stringify({
 				publicInfo: publicData,
-				encPrivateInfo: contractData["encPrivateInfo"]; 
+				encPrivateInfo: contractData["encPrivateInfo"] 
 			});
 			contractData["formattedContent"] = formattedContent; 
 			return sign(contractString, keyRing.skeySign);	  				
-		};).then( function(sig) {
+		}).then( function(sig) {
 			contractData["borrowerSignature"] = sig; 
 			return resolve(contractData); 
 		}).catch(function (err) {

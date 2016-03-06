@@ -201,20 +201,21 @@ module.exports = function(models){
           var _id = req.user.id;
           console.log(req)
           var profile = req.body.profile;
-          var newProfile = new PublicProfile({
-            name: marvel(),
-            avgMonthlyIncome :100000, //profile.financial.avgIncome,
-            avgMonthlySpendings : 90000,//profile.financial.avgSpendings,
-            desc : "hello world I am cool",
-            score : 5,//profile.financial.score,
-            u_id : req.user.id,
-          });
+          var newProfile = {
+              name: marvel(),
+              avgMonthlyIncome : profile.financial.avgIncome,
+              avgMonthlySpendings : profile.financial.avgSpendings,
+              desc : "hello world I am cool",
+              score : profile.financial.score,
+              u_id : req.user.id,
+          }
           PublicProfile.update(
             { "u_id": _id },
             newProfile,
             {upsert:true},
             function (err, profile) {
               if (err) {
+                console.log(err);
                 return res.send(500, {'message': err});
               }
               return res.json({ 'message': 'Profile was successfully created'});

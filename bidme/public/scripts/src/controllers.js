@@ -359,7 +359,9 @@ define(['angular'], function (angular) {
 	// compute a meaningful statistical score
 	  var score = 0.;
 	  if((avgIncome != 0) || (avgSpendings != 0)){
-			var score = avgIncome/(avgIncome - avgSpendings);
+			score = avgIncome/(avgIncome - avgSpendings);
+			score *= 100;
+			score = Math.round(score);
 	  }
 		console.log("Finscore: " + score);
 	  return score;
@@ -385,8 +387,8 @@ define(['angular'], function (angular) {
 
 	  return {
 		score: computeFinScore(pos/timeSpan,neg/timeSpan),
-		avgIncome: pos/timeSpan,
-		avgSpendings: neg/timeSpan,
+		avgIncome: Math.round(pos/timeSpan),
+		avgSpendings: Math.round(neg/timeSpan),
 	  };
 	}
 
