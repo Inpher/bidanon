@@ -88,7 +88,8 @@ define([
                     controllerAs: 'vm',
                     resolve: {
                         data : function(Resolver,ResourceService, localStorageService){
-                            return Resolver([ResourceService.getRequests(true),ResourceService.getBids(true,localStorageService.get("u_id"))])
+                            return Resolver([ResourceService.getRequests(true), ResourceService.getBids(true,localStorageService.get("u_id")),
+                                ResourceService.getClientRequests(true), ResourceService.getClientBids(true,localStorageService.get("u_id"))])
                         }
                     },
                     access: { requiredLogin: true }

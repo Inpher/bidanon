@@ -55,7 +55,15 @@ module.exports = function(app, passport,models) {
 
     app.get('/api/bids/:uid', showClientRequest, passport.authenticate('local-authorization', {
         session: false
-    }),api.getBidsPerUser);
+    }),api.getBidsPerBank);
+
+    app.get('/api/clientBids/:uid', showClientRequest, passport.authenticate('local-authorization', {
+        session: false
+    }),api.getBidsPerClient);
+    
+    app.get('/api/clientRequests', showClientRequest, passport.authenticate('local-authorization', {
+        session: false
+    }),api.getClientRequests);
 
     app.get('/api/requests', showClientRequest, passport.authenticate('local-authorization', {
         session: false

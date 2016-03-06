@@ -18,7 +18,7 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="request in vm.requests" ng-click="vm.showProfile(request)">
-                            <td class="text-center" ng-hide="request.modify"></td>
+                            <td class="text-center" ng-hide="request.modify">{{request.score}}</td>
                             <td class="text-center" ng-hide="request.modify">{{request.amount}}</td>
                             <td class="text-center" ng-hide="request.modify">{{request.maturity}}</td>
                         </tr>
@@ -30,8 +30,36 @@
 
         </div>
     </div>
+    <div class="row row-centered" >
+        <div class="col-md-5 col-centered">
+            <div class="panel panel-success" ng-show="vm.type == 'BANK'">
+                <!-- Default panel contents -->
+                <div class="panel-heading" >Current Bids</div>
+
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th class="text-center" width="30%">Score</th>
+                        <th class="text-center" width="30%">Interest Rate (%)</th>
+                        <th class="text-center" width="30%">Maturity (Years)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="bid in vm.bids" ng-click="vm.showProfile(bid)">
+                        <td class="text-center" ng-hide="request.modify">{{bid.score}}</td>
+                        <td class="text-center" ng-hide="request.modify">{{bid.intRate}}</td>
+                        <td class="text-center" ng-hide="request.modify">{{bid.maturity}}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
     <div class="row row-centered">
-        <div class="col-md-4 col-centered" ng-show="vm.type == 'CLIENT'">
+        <div class="col-md-5 col-centered" ng-show="vm.type == 'CLIENT'">
             <div class="panel panel-success">
                 <div class="panel-heading">
                     <h3 class="panel-title">Create A Request</h3>
@@ -44,6 +72,62 @@
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row row-centered" >
+        <div class="col-md-5 col-centered">
+                <div class="panel panel-success" ng-show="vm.type == 'CLIENT'">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading" >Placed Requests</div>
+
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                        <tr>
+                            <th class="text-center" width="30%">Score</th>
+                            <th class="text-center" width="30%">Amount (CHF)</th>
+                            <th class="text-center" width="30%">Maturity (Years)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="request in vm.clientRequests" >
+                            <td class="text-center" ng-hide="request.modify">{{request.score}}</td>
+                            <td class="text-center" ng-hide="request.modify">{{request.amount}}</td>
+                            <td class="text-center" ng-hide="request.modify">{{request.maturity}}</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+        </div>
+    </div>
+    <div class="row row-centered" >
+        <div class="col-md-5 col-centered">
+            <div class="panel panel-success" ng-show="vm.type == 'CLIENT'">
+                <!-- Default panel contents -->
+                <div class="panel-heading" >Current Bids</div>
+
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th class="text-center" width="30%">Score</th>
+                        <th class="text-center" width="30%">Interest Rate (%)</th>
+                        <th class="text-center" width="30%">Maturity (Years)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="bid in vm.clientBids" ng-click="vm.showProfile(bid)">
+                        <td class="text-center" ng-hide="request.modify">{{bid.score}}</td>
+                        <td class="text-center" ng-hide="request.modify">{{bid.intRate}}</td>
+                        <td class="text-center" ng-hide="request.modify">{{bid.maturity}}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+
         </div>
     </div>    
 </div>

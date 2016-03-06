@@ -166,22 +166,22 @@ module.exports = function(models){
 
             var uid = req.user.id;
             var rid = req.body.r_id;
-	    var intRate = req.body.intRate;
-	    var maturity = req.body.maturity;
+    	    var intRate = req.body.intRate;
+    	    var maturity = req.body.maturity;
 
-            var bid = new Bid({
-		u_id: uid,
-		req_id: rid,
-		intRate: intRate,
-		maturity: maturity,
-	    });
-	    bid.save(function(err, bid) {
-                if (err){
-                    return res.send(500, {'message': err});
-                }
-                return res.json({ 'message': 'Bid was successfully updated!'});
-            });
-        },
+                var bid = new Bid({
+    		u_id: uid,
+    		req_id: rid,
+    		intRate: intRate,
+    		maturity: maturity,
+    	    });
+    	    bid.save(function(err, bid) {
+                    if (err){
+                        return res.send(500, {'message': err});
+                    }
+                    return res.json({ 'message': 'Bid was successfully updated!'});
+                });
+            },
 
         removeBid: function(req,res)
         {
@@ -203,10 +203,10 @@ module.exports = function(models){
           var profile = req.body.profile;
           var newProfile = new PublicProfile({
             name: marvel(),
-            avgMonthlyIncome : profile.financial.avgIncome,
-            avgMonthlySpendings : profile.financial.avgSpendings,
+            avgMonthlyIncome :100000, //profile.financial.avgIncome,
+            avgMonthlySpendings : 90000,//profile.financial.avgSpendings,
             desc : "hello world I am cool",
-            score : profile.financial.score,
+            score : 5,//profile.financial.score,
             u_id : req.user.id,
           });
           PublicProfile.update(
@@ -231,14 +231,44 @@ module.exports = function(models){
         getRequests: function(req,res)
         {
             Request.find(function(err,requests){
+                for (var i = 0; i < requests.length; i++) {
+
+                    PublicProfile.findOne({"u_id":requests[i].u_id}, function(err,publicProfile){
+                        for (var i = 0; i < requests.length; i++) {
+                            if(requests[i].u_id == publicProfile.u_id){
+                                requests[i].score=publicProfile.score;
+                                console.log(requests[i].score);
+                                break;
+                            }
+                        }
+                    });
+                }
                 return res.json({requests: requests });
             });
 
         },
-        getBidsPerUser: function (req,res) {
+        getBidsPerBank: function (req,res) {
             var _id = req.params.uid;
             Bid.find({ "u_id":  _id},function(err,bids){
                 return res.json({bids: bids });
+            });
+        },
+        getClientRequests:  function (req,res) {
+            var _id = req.user.id;
+            Request.find({ "u_id":  _id},function(err,clientRequests){
+                return res.json({clientRequests: clientRequests });
+            });
+        },
+        getBidsPerClient: function (req,res) {
+            var _id = req.user.id;
+            Request.find({ "u_id":  _id},function(err,requests){
+                var rids = [];
+                for (var i = 0; i < requests.length; i++) {
+                    rids[i] = requests._id;
+                }
+                Bid.find({"r_id": {$in: rids}},function(err,clientBids){
+                    return res.json({clientBids: clientBids });
+                });
             });
         },
         getInfoRequest: function (req,res) {

@@ -57,8 +57,14 @@ define(['angular'], function (angular) {
             getBids : function(refresh, u_id){
                 return _promisesGetter('GET','/api/bids/'+u_id, null, "bids", refresh);
             },
+            getClientBids: function(refresh, u_id){
+                return _promisesGetter('GET','/api/clientBids/'+u_id, null, "bids", refresh);
+            },
             getRequests : function(refresh){
                 return _promisesGetter('GET','/api/requests', null, "requests", refresh);
+            },
+            getClientRequests : function(refresh){
+                return _promisesGetter('GET','/api/clientRequests', null, "clientRequests", refresh);
             },
             getInfoRequest : function(rid){
                 return _promisesGetter('GET','/api/infoRequest/'+rid, null, "profile", true);
