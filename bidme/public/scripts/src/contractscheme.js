@@ -533,3 +533,31 @@ function lenderSign(contractData) {
 	}); 
     });	
 }
+
+
+// test contract unit test
+// (you must run this function when you are logged-in)
+function testEncryptedContractsGeneration() {
+    console.log("Generating a demo Bank keyring");
+    generateKeyRing().then(function(x) {
+	bankKeyRing=x; 
+	borrower_id = JSON.parse(localStorage.getItem("ls.u_id")); 
+	publicData = { "amount":10000, "interestRate":1.25, "maturity":10, "borrower_id":borrower_id, "lender_id": "ID1234"}
+	console.log("Generating a demo Contract, and sign it as a borrower");
+	return createAndSignContract(publicData, bankKeyRing.pkeyEncrypt);
+    }).then(function(c) {
+	encrContract=c;
+	console.log(c);
+	console.log("Decrypting and printing the contract, received by the lender. (the lender signature is still null)");
+	var k = encrContract.lenderEncKey; encrContract.lenderEncKey = encrContract.borrowerEncKey; encrContract.borrowerEncKey=k;
+	//var k = encrContract.lenderSignature; encrContract.lenderSignature = encrContract.borrowerSignature; encrContract.borrowerSignature=k;
+	return decryptPrivateInfo(encrContract);
+    }).then(function(fullcontract) {
+	console.log(fullcontract);
+	console.log("Sign the contract as a lender.");
+	return lenderSign(encrContract);
+    }).then(function(ec) {
+	console.log(ec);
+    }); 
+}
+
