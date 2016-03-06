@@ -86,6 +86,8 @@ The following script shows a PoC how this data could be accessed from the app it
 $PROJECT_HOME/retrieveTransactions.py
 ```
 
+# Future work and improvements
+
 ## Social Score
 Using the facebook graph API. The score is again calculated based on some heuristics of the following parameters:
 - Age
