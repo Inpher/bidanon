@@ -1,22 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf8">
-    <base href="/">
-    <title>Angular Express MongoDB Bootstrap NotyJS Seed App</title>
-    <link rel="stylesheet" type="text/css" href="scripts/lib/angular-toastr/dist/angular-toastr.css" />
-    <link rel="stylesheet" href="scripts/lib/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="css/app.css">
+  <meta charset="utf8">
+  <base href="/">
+  <title>Angular Express MongoDB Bootstrap NotyJS Seed App</title>
+  <link rel="stylesheet" type="text/css" href="scripts/lib/angular-toastr/dist/angular-toastr.css" />
+  <link rel="stylesheet" href="scripts/lib/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="css/app.css">
 
 </head>
 <body>
+  <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '233247063385142',
+      xfbml      : true,
+      version    : 'v2.0'
+    });
+  };
 
-    <div id="app-container" ng-view></div>
+  (function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+  </script>
 
-    <!-- <script data-main="scripts/webapp.min.js" src="scripts/lib/requirejs/require.js"></script> -->
 
-    <script data-main="scripts/src/main.js" src="scripts/lib/requirejs/require.js"></script>
-    <script src="scripts/src/contractscheme.js"></script>
+  <div id="app-container" ng-view></div>
+
+  <!-- <script data-main="scripts/webapp.min.js" src="scripts/lib/requirejs/require.js"></script> -->
+
+  <script data-main="scripts/src/main.js" src="scripts/lib/requirejs/require.js"></script>
+  <script src="scripts/src/contractscheme.js"></script>
 
 </body>
 </html>
