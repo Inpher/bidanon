@@ -480,7 +480,7 @@ define(['angular'], function (angular) {
 					}
 					var prof = response.work.length * 20;
 					var socialscore = (education*0.4 + prof*0.5 + response.age_range.min*0.1);
-					console.log("Finscore:"+socialscore);
+					console.log("Social:"+socialscore);
 					vm.social = socialscore;
 				});
 			}
