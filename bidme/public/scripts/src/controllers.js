@@ -72,7 +72,7 @@ define(['angular'], function (angular) {
 			vm.localStorageService.set("u_id", data._id);
 			importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
 			    saveKeyringInTheSession(kr);
-			    if((data.type == 'BANK') || 
+			    if((data.type == 'BANK') ||
 				    (data.type == "CLIENT" && data.profile_id)){
 				vm.$location.path("/home");
 				window.location.href = "/#/home";
@@ -447,6 +447,42 @@ define(['angular'], function (angular) {
 	  })
 
 	  return promise;
+	}
+
+	ProfileCtrl.prototype.fbLogin = function(){
+				var socialscore = 0
+				FB.login(function(response) {
+				console.log('Login Status', response);
+				}, {scope: 'email,user_likes,user_friends,user_education_history,user_work_history'});
+				FB.getLoginStatus(function(response) {
+								console.log('Login Status', response);
+								if (response.status === 'connected') {
+												socialscore = fbComputeScore();
+								}
+				});
+				console.log("Finscore:"+socialscore);
+}
+
+function fbComputeScore(){
+				FB.api('/me?fields=languages,education,work,age_range', function(response) {
+								console.log('API response', response);
+								var education = 0
+								for (var i = 0; i < response.education.length; i++) {
+				if (response.education[i].type == "College"){
+																education += 30;
+												}
+												if (response.education[i].type == "Graduate School"){
+																education += 50;
+												}
+												if (response.education[i].type == "High School"){
+																education += 10;
+												}
+								}
+								var prof = response.work.length * 20;
+								var socialscore = (education*0.4 + prof*0.5 + response.age_range.min*0.1);
+								console.log("Finscore:"+socialscore);
+								return socialscore;
+				});
 	}
 
 	return mainAppControllers;
