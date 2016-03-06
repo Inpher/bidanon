@@ -1,4 +1,7 @@
 /* app css stylesheet */
+.panel {
+  opacity: 0.85;
+}
 
 .no-bottom-margin {
     margin-bottom: 0px;
