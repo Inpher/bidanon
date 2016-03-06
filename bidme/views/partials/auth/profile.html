@@ -15,7 +15,7 @@
             <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
               <b>Please select exported financial data:</b>
               <br></br>
-              <input id='dataFileList' type="file" ngf-select>
+              <input id='dataFileList' type="file" ngf-select></input>
               <!--- <button ng-click="vm.updateFileList()">submit</button> -->
             </div>
           </div>
@@ -24,19 +24,13 @@
             <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isSocialOn">
               <b>Please login to facebook</b>
               <br></br>
+              <button id='fb' type="button" class='button facebook' ng-click='vm.fbLogin()'></button>
             </div>
           </div>
           <div class="checkbox disabled">
             <label><input type="checkbox" value="" ng-model="vm.dataSources.isHealthOn" disabled>Health data</label>
           </div>
           <br>
-          <fb:login-button length="long" background="light" perms="email" size="medium" onlogin="loginWithFacebookConnect()">Login to facebook</fb:login-button>
-          <div
-          class="fb-like"
-          data-share="true"
-          data-width="450"
-          data-show-faces="true">
-        </div>
         <input type="submit" class="btn btn-primary" value="Create"/>
       </form>
     </div>
