@@ -347,6 +347,7 @@ define(['angular'], function (angular) {
 		  isSocialOn : false,
 		  isHealthOn : false,
 		};
+		vm.social = 0;
 	}
 
 
@@ -393,7 +394,7 @@ define(['angular'], function (angular) {
 	  var Profile = {
 		profile : {
 		  financial: null,
-		  social: null,
+		  social: vm.social,
 		  health: null,
 		}
 	  };
@@ -425,7 +426,7 @@ define(['angular'], function (angular) {
 			window.location.href = "/#/home";
 		  }
 	  };
-
+		console.log(Profile);
 	};
 
 	ProfileCtrl.prototype.updateFileList = function(){
@@ -450,39 +451,44 @@ define(['angular'], function (angular) {
 	}
 
 	ProfileCtrl.prototype.fbLogin = function(){
-				var socialscore = 0
-				FB.login(function(response) {
-				console.log('Login Status', response);
-				}, {scope: 'email,user_likes,user_friends,user_education_history,user_work_history'});
-				FB.getLoginStatus(function(response) {
-								console.log('Login Status', response);
-								if (response.status === 'connected') {
-												socialscore = fbComputeScore();
-								}
-				});
-				console.log("Finscore:"+socialscore);
-}
+		var vm = this;
+		var socialscore = 0
 
-function fbComputeScore(){
+		// Login
+		FB.login(function(response) {
+			console.log('Login Status', response);
+		}, {scope: 'email,user_likes,user_friends,user_education_history,user_work_history'});
+
+		// Check login status
+		FB.getLoginStatus(function(response) {
+			console.log('Login Status', response);
+			if (response.status === 'connected') {
+				// Actual graph api request
 				FB.api('/me?fields=languages,education,work,age_range', function(response) {
-								console.log('API response', response);
-								var education = 0
-								for (var i = 0; i < response.education.length; i++) {
-				if (response.education[i].type == "College"){
-																education += 30;
-												}
-												if (response.education[i].type == "Graduate School"){
-																education += 50;
-												}
-												if (response.education[i].type == "High School"){
-																education += 10;
-												}
-								}
-								var prof = response.work.length * 20;
-								var socialscore = (education*0.4 + prof*0.5 + response.age_range.min*0.1);
-								console.log("Finscore:"+socialscore);
-								return socialscore;
+					console.log('API response', response);
+					var education = 0
+					for (var i = 0; i < response.education.length; i++) {
+						if (response.education[i].type == "College"){
+							education += 30;
+						}
+						if (response.education[i].type == "Graduate School"){
+							education += 50;
+						}
+						if (response.education[i].type == "High School"){
+							education += 10;
+						}
+					}
+					var prof = response.work.length * 20;
+					var socialscore = (education*0.4 + prof*0.5 + response.age_range.min*0.1);
+					console.log("Finscore:"+socialscore);
+					vm.social = socialscore;
 				});
+			}
+		});
+	}
+
+	function fbComputeScore(){
+
 	}
 
 	return mainAppControllers;
