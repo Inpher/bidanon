@@ -444,21 +444,65 @@ function createAndSignContract(publicData, keyRing, lenderPKey) {
 	});
 }
 
+// Input Format: 
+// {
+//	formattedContent: String,
+//	borrowerEncKey: String,
+//	lenderEncKey: String,
+//	borrowerSignature: String, 
+//	lenderSignature: String
+// }
+//
+// Output format:
+//{
+//    privateInfo: { 
+//	privateDataBorrower: {
+//	    name: "" , 
+//	    age: 30 , 
+//	    address:"" 
+//	},  
+//	privateDataLender: {
+//	    bank:"" , 
+//	    address:"" 
+//	}	
+//    },
+//    publicInfo: {
+//	amount=10,
+//	interestRate=10,
+//	maturity=""; 
+//	borrower_id="";
+//	lender_id"";
+//    },
+//    borrowerEncKey: "",
+//    lenderEncKey: "",
+//    borrowerSignature: "", 
+//    lenderSignature: ""
+//}
 function decryptPrivateInfo(contractData) {
-	// TODO: contract data should not contain publicInfo and formattedInfo - 
-	//       these can be recalculated by the server and the client too. 
-	return new Promise(function(resolve, reject) {
-		var endPrivateInfo = contractData["encPrivateInfo"];
-		getKeyringFromTheSession().then( function(keyRing) {
-			var ct = { "ct":encPrivateInfo, "enckey":contractData["lenderEncKey"] }; 
-			// decrypt private info 
-			return decrypt(ct, keyRing.skeyEncrypt);
-		}).then(function(ptext) {
-			return resolve(JSON.parse(ptext)); 
-		}).catch(function(err) {
-			return reject(err); 
-		}); 
+    var reps = {};
+    reps.borrowerEncKey = contractData.borrowerEncKey;
+    reps.lenderEncKey = contractData.lenderEncKey;
+    reps.borrowerSignature = contractData.borrowerSignature;
+    reps.lenderSignature = contractData.lenderSignature;
+    var fContentObj = JSON.parse(contractData.formattedContent);
+    reps.publicInfo = fContentObj.publicInfo;
+    // TODO: contract data should not contain publicInfo and formattedInfo - 
+    //       these can be recalculated by the server and the client too. 
+    return new Promise(function(resolve, reject) {
+	getKeyringFromTheSession().then( function(keyRing) {
+	    var ct = { 
+		ct: fContentObj.encPrivateInfo, 
+		enckey: reps.lenderEncKey 
+	    }; 
+	    // decrypt private info 
+	    return decrypt(ct, keyRing.skeyEncrypt);
+	}).then(function(ptext) {
+	    reps.privateInfo = JSON.parse(ptext);
+	    return resolve(reps); 
+	}).catch(function(err) {
+	    return reject(err); 
 	}); 
+    }); 
 }
 
 function lenderSign(contractData) {
