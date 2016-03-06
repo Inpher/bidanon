@@ -168,12 +168,14 @@ module.exports = function(models){
             var rid = req.body.r_id;
     	    var intRate = req.body.intRate;
     	    var maturity = req.body.maturity;
+          var status = req.body.status;
 
                 var bid = new Bid({
     		u_id: uid,
     		req_id: rid,
     		intRate: intRate,
     		maturity: maturity,
+        status: status,
     	    });
     	    bid.save(function(err, bid) {
                     if (err){

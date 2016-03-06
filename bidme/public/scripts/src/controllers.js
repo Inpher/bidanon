@@ -186,7 +186,8 @@ define(['angular'], function (angular) {
 		var bid = {
 			intRate: vm.interestRate,
 			maturity: vm.maturity,
-			r_id: $('#thereqidishere').val()
+			r_id: $('#thereqidishere').val(),
+			status: "NEW"
 	   	};
 		vm.ResourceService.placeBid(bid).then(function(){
 			vm.toastr.success("Bid Added!");
