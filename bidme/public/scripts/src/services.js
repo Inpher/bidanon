@@ -66,6 +66,9 @@ define(['angular'], function (angular) {
             getClientRequests : function(refresh){
                 return _promisesGetter('GET','/api/clientRequests', null, "clientRequests", refresh);
             },
+            getPublicProfiles : function(refresh){
+                return _promisesGetter('GET','/api/scoreRequest', null, "requests", refresh);
+            },
             getInfoRequest : function(rid){
                 return _promisesGetter('GET','/api/infoRequest/'+rid, null, "profile", true);
             },

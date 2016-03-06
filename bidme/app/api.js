@@ -47,7 +47,7 @@ module.exports = function(models){
             res.send(500, {'message': err});
             // check to see if theres already a user with that email
             if (profile) {
-	      console.log('A profile was found!');	
+	      console.log('A profile was found!');
               return res.json({
                 auth_token: req.user.token.auth_token,
                 type:req.user.type,
@@ -55,7 +55,7 @@ module.exports = function(models){
                 "profile_id":profile._id,
                 encKeyRing:req.user.encKeyRing});
             } else {
-	      console.log('No profile was found!');	
+	      console.log('No profile was found!');
               return res.json({
                 auth_token: req.user.token.auth_token,
                 type:req.user.type,
@@ -219,6 +219,32 @@ module.exports = function(models){
               }
               return res.json({ 'message': 'Profile was successfully created'});
           });
+        },
+
+        getMergedScoreRequests: function(req,res)
+        {
+            PublicProfile.find(function(err,profiles){
+                Request.find(function(err,requests){
+                  var merged = requests.map(function(r){
+                      function getScore(uid) {
+                        for(var i=0; i<profiles.length; i++) {
+                          if (profiles[i].u_id.equals(uid)) {
+                            return profiles[i].score;
+                          }
+                        }
+                      }
+                      var score = getScore(r.u_id);
+                      return {
+                        _id: r._id,
+                        u_id: r.u_id,
+                        score: score,
+                        amount: r.amount,
+                        maturity: r.maturity,
+                      };
+                  });
+                  return res.json({ requests: merged })
+                });
+            });
         },
 
         getBids: function(req,res)

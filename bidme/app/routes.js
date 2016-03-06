@@ -60,7 +60,7 @@ module.exports = function(app, passport,models) {
     app.get('/api/clientBids/:uid', showClientRequest, passport.authenticate('local-authorization', {
         session: false
     }),api.getBidsPerClient);
-    
+
     app.get('/api/clientRequests', showClientRequest, passport.authenticate('local-authorization', {
         session: false
     }),api.getClientRequests);
@@ -68,7 +68,7 @@ module.exports = function(app, passport,models) {
     app.get('/api/requests', showClientRequest, passport.authenticate('local-authorization', {
         session: false
     }),api.getRequests);
-    
+
     app.get('/api/infoRequest/:id', showClientRequest, passport.authenticate('local-authorization', {
         session: false
     }),api.getInfoRequest);
@@ -80,6 +80,10 @@ module.exports = function(app, passport,models) {
     app.post('/api/profile', showClientRequest, passport.authenticate('local-authorization', {
       session: false
     }),api.createProfile);
+
+    app.get('/api/scoreRequest', showClientRequest, passport.authenticate('local-authorization', {
+      session: false
+    }),api.getMergedScoreRequests);
 
     app.post('/api/bid', showClientRequest, passport.authenticate('local-authorization', {
         session: false

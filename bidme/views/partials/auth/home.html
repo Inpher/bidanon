@@ -17,7 +17,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="request in vm.requests" ng-click="vm.showProfile(request)">
+                        <tr ng-repeat="request in vm.scoreRequests" ng-click="vm.showProfile(request)">
                             <td class="text-center" ng-hide="request.modify">{{request.score}}</td>
                             <td class="text-center" ng-hide="request.modify">{{request.amount}}</td>
                             <td class="text-center" ng-hide="request.modify">{{request.maturity}}</td>
@@ -129,5 +129,5 @@
             </div>
 
         </div>
-    </div>    
+    </div>
 </div>

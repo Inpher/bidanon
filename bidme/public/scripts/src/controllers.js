@@ -210,6 +210,9 @@ define(['angular'], function (angular) {
 		vm.bids = data[1].bids;
 		vm.clientRequests = data[2].clientRequests;
 		vm.clientBids = data[3].clientBids;
+		vm.scoreRequests = data[4].requests;
+
+		console.log(vm.scoreRequests);
 
 		vm.$location = $location;
 	}

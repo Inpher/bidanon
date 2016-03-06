@@ -89,7 +89,8 @@ define([
                     resolve: {
                         data : function(Resolver,ResourceService, localStorageService){
                             return Resolver([ResourceService.getRequests(true), ResourceService.getBids(true,localStorageService.get("u_id")),
-                                ResourceService.getClientRequests(true), ResourceService.getClientBids(true,localStorageService.get("u_id"))])
+                                ResourceService.getClientRequests(true), ResourceService.getClientBids(true,localStorageService.get("u_id")),
+                                ResourceService.getPublicProfiles(true)])
                         }
                     },
                     access: { requiredLogin: true }
