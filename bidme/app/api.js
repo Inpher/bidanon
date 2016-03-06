@@ -234,6 +234,9 @@ module.exports = function(models){
                 for (var i = 0; i < requests.length; i++) {
 
                     PublicProfile.findOne({"u_id":requests[i].u_id}, function(err,publicProfile){
+			if (err) {
+			    return res.send(500, {'message': err});
+			}
                         for (var i = 0; i < requests.length; i++) {
                             if(requests[i].u_id == publicProfile.u_id){
                                 requests[i].score=publicProfile.score;

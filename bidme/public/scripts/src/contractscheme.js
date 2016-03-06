@@ -1,4 +1,5 @@
 var crypto = window.crypto || window.msCrypto;
+var keyRing = null;
 
 if (crypto && !crypto.subtle && crypto.webkitSubtle) {
 	crypto.subtle = crypto.webkitSubtle;
@@ -345,3 +346,43 @@ function testEverything() {
 	console.log(text);
     });
 }
+
+
+function deleteKeyringFromTheSession() {
+    keyRing = null;
+    sessionStorage.removeItem('keyRing');
+}
+
+function saveKeyringInTheSession(kr) {
+    keyRing = kr;
+    encryptAndExportKeyring(kr,'').then(function(ekr) {
+	sessionStorage.setItem('keyRing',JSON.stringify(ekr));
+	console.log("Welcome! Keyring stored in the sessionStorage");
+    });
+}
+
+function loadKeyringFromTheSession() {
+    var ekr = sessionStorage.getItem('keyRing');
+    if (ekr==null) {
+	return console.log("Error getting the keyring from the session");
+    }
+    importAndDecryptKeyring(JSON.parse(ekr), '').then(function(kr) {
+	keyRing=kr;
+    });
+}
+
+function getKeyringFromTheSession() {
+    return new Promise(function(resolve, reject){
+	if (keyRing!=null) return resolve(keyRing);
+	var ekr = sessionStorage.getItem('keyRing');
+	if (ekr==null) {
+	    console.log("Error getting the keyring from the session");
+	    return reject("Error getting the keyring from the session");
+	}
+	importAndDecryptKeyring(JSON.parse(ekr), '').then(function(kr) {
+	    keyRing=kr;
+	    return resolve(kr);
+	});
+    });
+}
+

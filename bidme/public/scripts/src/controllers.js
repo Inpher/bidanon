@@ -36,6 +36,7 @@ define(['angular'], function (angular) {
 	{
 		var vm = this;
 		vm.localStorageService.clearAll();
+		deleteKeyringFromTheSession();
 		vm.$location.path("/login");
 	};
 
@@ -60,6 +61,7 @@ define(['angular'], function (angular) {
 			return noty({text: 'Username and password are mandatory!',  timeout: 2000, type: 'error'});
 	}
 
+		deleteKeyringFromTheSession();
 		var salt = vm.username;
 		var enc_password = CryptoJS.PBKDF2(vm.password, salt, { keySize: 256/32 });
 		var user = {"username": vm.username, "password": enc_password.toString()};
@@ -69,20 +71,17 @@ define(['angular'], function (angular) {
 			vm.localStorageService.set("type", data.type);
 			vm.localStorageService.set("u_id", data._id);
 			importAndDecryptKeyring(data.encKeyRing, vm.password).then(function(kr) {
-			return encryptAndExportKeyring(kr, '');
-			}).then(function(eekr) {
-			  sessionStorage.setItem('keyRing',JSON.stringify(eekr));
-			  console.log("Welcome! Keyring stored in the sessionStorage");
-			  if((data.type == 'BANK') || 
-				(data.type == "CLIENT" && data.profile_id)){
+			    saveKeyringInTheSession(kr);
+			    if((data.type == 'BANK') || 
+				    (data.type == "CLIENT" && data.profile_id)){
 				vm.$location.path("/home");
 				window.location.href = "/#/home";
 				return;
-			} else {
+			    } else {
 				vm.$location.path("/profile");
 				window.location.href = "/#/profile";
 				return;
-			}
+			    }
 			  // window.location.href="/#/home"; //TODO For some reason, the line below is not sufficient anymore
 			  // return vm.$location.path("/home");
 			}).catch(function(err) {
