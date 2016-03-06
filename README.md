@@ -1,7 +1,7 @@
 # six-hackathon
 Authors: Betty, Seb, Nicolas, Alex @inpher.io
 
-Bid Anon- A competitive bidding platform with privacy and insight.
+### Bid Anon- A competitive bidding platform with privacy and insight
 
 Description: Bid Anon is a privacy preserving open bidding platform that matches borrowers and lenders
 with rich statistical data and post transactional verification.  Existing lending marketplaces are based on
@@ -57,7 +57,7 @@ The idea is to match borrowers with lenders anonymously based on objective crite
 ### Creating and Signing Contracts
 Once the lender accepts a loan proposal (bid), the identities are revealed and a contract is created. The contract is cryptographically signed by the borrower, the private data (including identities) is encrypted with public keys for both the borrower and the lender (on the borrower side) so that it remains invisible. The contract is then sent to the lender (the bank) to reveal the private data (after decryption) and sign the final contract with the bank's signing key. The server is capable of verifying the integrity and the authenticity of the contract without having the private information (a blind signature). 
 
-### Testing signing contracts in the Chrome JS developer console
+### Testing signing contracts in the javascript developerconsole
 You can do unit tests for signing contracts from the console via the following steps: 
 - [Login](http://localhost:3000) as a user (borrower) from the browser 
 - From the Chrome browser javascript console, run the following function: 
@@ -86,10 +86,11 @@ The following script shows a PoC how this data could be accessed from the app it
 $PROJECT_HOME/retrieveTransactions.py
 ```
 
-# Future work and improvements
-
 ## Social Score
 Using the facebook graph API. The score is again calculated based on some heuristics of the following parameters:
 - Age
 - Education
 - Work
+
+## Decentralized Trading Platform for Loan Contracts 
+Once the contract has been created, it can be traded between borrowers or lenders (as bonds are traded) in a decentralized way using blockchains. Suppose that a borrower has a mortgage contract (with a loan amount or "par value") and a maturity date. If that borrower wants to sell the loan contract to another borrower without going through a centralized brokerage scheme, one can represent the loan contract via Ethereum smart contract and securely change the ownership of the contract (the borrower). The contract buyer could then pay with cryptographic currency (bitcoin), again in a decentralized manner.      
