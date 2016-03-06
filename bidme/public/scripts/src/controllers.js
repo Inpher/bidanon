@@ -73,7 +73,7 @@ define(['angular'], function (angular) {
     	    }).then(function(eekr) {
     		  sessionStorage.setItem('keyRing',JSON.stringify(eekr));
     		  console.log("Welcome! Keyring stored in the sessionStorage");
-              if(data.type == "CLIENT" && !!(data.profile_id)){
+              if(data.type == "CLIENT" && data.profile_id){
                 vm.$location.path("/home");
                 window.location.href = "/#/home";
                 return;
