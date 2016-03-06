@@ -73,7 +73,7 @@ define(['angular'], function (angular) {
 			}).then(function(eekr) {
 			  sessionStorage.setItem('keyRing',JSON.stringify(eekr));
 			  console.log("Welcome! Keyring stored in the sessionStorage");
-			  if((data.type == 'BANK') || 
+			  if((data.type == 'BANK') ||
 				(data.type == "CLIENT" && data.profile_id)){
 				vm.$location.path("/home");
 				window.location.href = "/#/home";
@@ -185,7 +185,7 @@ define(['angular'], function (angular) {
 	InfoRequestCtrl.prototype.placeBid = function(index){
 		var vm = this;
 		var bid = {
-			intRate: vm.interestRate, 
+			intRate: vm.interestRate,
 			maturity: vm.maturity,
 			r_id: $('#thereqidishere').val()
 	   	};
@@ -210,7 +210,7 @@ define(['angular'], function (angular) {
 		vm.bids = data[1].bids;
 		vm.clientRequests = data[2].clientRequests;
 		vm.clientBids = data[3].clientBids;
-		
+
 		vm.$location = $location;
 	}
 	HomeCtrl.prototype.updatePerson = function(index, modify)
@@ -356,8 +356,9 @@ define(['angular'], function (angular) {
 	// compute a meaningful statistical score
 	  var score = 0.;
 	  if((avgIncome != 0) || (avgSpendings != 0)){
-		var score = avgIncome/(avgIncome - avgSpendings);
+			var score = avgIncome/(avgIncome - avgSpendings);
 	  }
+		console.log("Finscore: " + score);
 	  return score;
 	}
 
