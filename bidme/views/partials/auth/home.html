@@ -114,6 +114,7 @@
                         <th class="text-center" width="30%">Score</th>
                         <th class="text-center" width="30%">Interest Rate (%)</th>
                         <th class="text-center" width="30%">Maturity (Years)</th>
+                        <th class="text-center" width="30%">Status</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -121,6 +122,8 @@
                         <td class="text-center" ng-hide="request.modify">{{bid.score}}</td>
                         <td class="text-center" ng-hide="request.modify">{{bid.intRate}}</td>
                         <td class="text-center" ng-hide="request.modify">{{bid.maturity}}</td>
+                        <td class="text-center" ng-hide"bid.status == 'NEW'" ng-click="vm.accept(bid)">{{bid.status}}</td>
+                        <td class="text-center" ng-hide"bid.status != 'NEW'" >{{bid.status}}</td>
                     </tr>
 
                     </tbody>
