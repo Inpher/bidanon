@@ -505,16 +505,33 @@ function decryptPrivateInfo(contractData) {
     }); 
 }
 
+// Input Format: 
+// {
+//	formattedContent: String,
+//	borrowerEncKey: String,
+//	lenderEncKey: String,
+//	borrowerSignature: String, 
+//	lenderSignature: null
+// }
+//
+// Output format:
+// {
+//	formattedContent: String,
+//	borrowerEncKey: String,
+//	lenderEncKey: String,
+//	borrowerSignature: String, 
+//	lenderSignature: String
+// }
 function lenderSign(contractData) {
-	return new Promise(function(resolve, reject) {
-		var formattedContent = contractData["formattedContent"];
-		getKeyringFromTheSession().then( function(keyRing) { 
-			return sign(formattedContent, keyRing.skeySign);
-		}).then(function(sig) {
-			contractData["lenderSignature"] = sig; 
-			return resolve(contractData); 
-		}).catch(function(err) {
-			return reject(err); 
-		}); 
-	});	
+    return new Promise(function(resolve, reject) {
+	var formattedContent = contractData.formattedContent;
+	getKeyringFromTheSession().then(function(keyRing) { 
+	    return sign(formattedContent, keyRing.skeySign);
+	}).then(function(sig) {
+	    contractData.lenderSignature = sig; 
+	    return resolve(contractData); 
+	}).catch(function(err) {
+	    return reject(err); 
+	}); 
+    });	
 }
