@@ -38,7 +38,9 @@
                     </tbody>
                   </table>
                   <form ng-submit="vm.placeBid()" role="form" class="form-inline special-form">
-                    <fieldset>
+		      <input id="thereqidishere" type="hidden" name="rid"
+			     ng-model="vm.rid" value="{{vm.profile.request._id}}" />
+		      <fieldset>
                         <div class="form-group ">
                             <input type="text" class="form-control" ng-model="vm.interestRate" placeholder="Interest rate" required>
                         </div>

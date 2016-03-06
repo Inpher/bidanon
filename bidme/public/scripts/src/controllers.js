@@ -183,7 +183,11 @@ define(['angular'], function (angular) {
 
     InfoRequestCtrl.prototype.placeBid = function(index){
         var vm = this;
-        var bid = {intRate: vm.interestRate, maturity: vm.maturity};
+        var bid = {
+	    intRate: vm.interestRate, 
+	    maturity: vm.maturity,
+	    r_id: $('#thereqidishere').val()
+	};
         vm.ResourceService.placeBid(bid).then(function(){
             vm.toastr.success("Bid Added!");
         },function(data, status) {

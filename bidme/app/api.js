@@ -47,6 +47,7 @@ module.exports = function(models){
             res.send(500, {'message': err});
             // check to see if theres already a user with that email
             if (profile) {
+	      console.log('A profile was found!');	
               return res.json({
                 auth_token: req.user.token.auth_token,
                 type:req.user.type,
@@ -54,6 +55,7 @@ module.exports = function(models){
                 "profile_id":profile._id,
                 encKeyRing:req.user.encKeyRing});
             } else {
+	      console.log('No profile was found!');	
               return res.json({
                 auth_token: req.user.token.auth_token,
                 type:req.user.type,
@@ -158,23 +160,29 @@ module.exports = function(models){
 
         },
 
-        updateBid: function(req,res)
+        placeBid: function(req,res)
         {
-            var _id = req.params.id;
             console.log(req.body);
-            console.log(_id);
 
-            var bid = req.body.bid;
+            var uid = req.user.id;
+            var rid = req.body.r_id;
+	    var intRate = req.body.intRate;
+	    var maturity = req.body.maturity;
 
-            var query = { _id: _id };
-            Bid.update(query, {score:bid.score,amount:bid.amount}, null, function (err, bid) {
+            var bid = new Bid({
+		u_id: uid,
+		req_id: rid,
+		intRate: intRate,
+		maturity: maturity,
+	    });
+	    bid.save(function(err, bid) {
                 if (err){
                     return res.send(500, {'message': err});
                 }
                 return res.json({ 'message': 'Bid was successfully updated!'});
-            })
-
+            });
         },
+
         removeBid: function(req,res)
         {
             var _id = req.params.id;

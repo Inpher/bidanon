@@ -70,7 +70,7 @@ define(['angular'], function (angular) {
               return _ajaxRequest('POST', '/api/profile', profile, null);
             },
             placeBid : function(bid){
-                return _ajaxRequest('POST', '/api/bid/'+bid._id, bid, null);
+                return _ajaxRequest('POST', '/api/bid', bid, null);
             },
             createPerson : function(person){
                 return _ajaxRequest('POST', '/api/person', person, null);
