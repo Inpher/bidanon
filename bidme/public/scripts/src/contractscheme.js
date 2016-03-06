@@ -425,7 +425,7 @@ function createAndSignContract(publicData, lenderPKey) {
 		}).then( function(ct) {
 			formattedContent["publicInfo"] = publicData;
 			formattedContent["encPrivateInfo"] = ct["ct"];
-			contractData["borrowerEncKEy"] = ct["enckey"];
+			contractData["borrowerEncKey"] = ct["enckey"];
 			return reencryptSessionKey(ct["enckey"], keyRing.skeyEncrypt, lenderPKey); 
 		}).then(function(lenderEncKey) {
 			contractData["lenderEncKey"] = lenderEncKey; 
