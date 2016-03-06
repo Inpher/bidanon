@@ -2,34 +2,45 @@
 <div ng-include src="'partials/header.html'"></div>
 
 <div class="container-fluid">
-		<div class="row row-centered">
-				<div class="col-md-5 col-centered">
-            <div class="panel panel-info">
-                <!-- Default panel contents -->
-                <div class="panel-heading">Profile Creation</div>
-                  <form ng-submit="vm.createProfile()" role="form" class="form">
-                        <h2>Data Sources</h2>
-                        <p>Select which data source you wish to enable to create the profile</p>
-                        <div class="checkbox">
-                          <label><input type="checkbox" value="" ng-model="vm.dataSources.isFinancialOn">Financial data</label>
-                          <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
-                            <b>Please select exported financial data:</b>
-                            <br></br>
-                            <input id='dataFileList' type="file" ngf-select>
-                            <!--- <button ng-click="vm.updateFileList()">submit</button> -->
-                          </div>
-                        </div>
-                        <div class="checkbox">
-                          <label><input type="checkbox" value="" ng-model="vm.dataSources.isSocialOn">Social data</label>
-                        </div>
-                        <div class="checkbox disabled">
-                          <label><input type="checkbox" value="" ng-model="vm.dataSources.isHealthOn" disabled>Health data</label>
-                        </div>
-                      <br>
-                      <input type="submit" class="btn btn-primary" value="Create"/>
-                  </form>
+  <div class="row row-centered">
+    <div class="col-md-5 col-centered">
+      <div class="panel panel-info">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Profile Creation</div>
+        <form ng-submit="vm.createProfile()" role="form" class="form">
+          <h2>Data Sources</h2>
+          <p>Select which data source you wish to enable to create the profile</p>
+          <div class="checkbox">
+            <label><input type="checkbox" value="" ng-model="vm.dataSources.isFinancialOn">Financial data</label>
+            <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isFinancialOn">
+              <b>Please select exported financial data:</b>
+              <br></br>
+              <input id='dataFileList' type="file" ngf-select>
+              <!--- <button ng-click="vm.updateFileList()">submit</button> -->
             </div>
+          </div>
+          <div class="checkbox">
+            <label><input type="checkbox" value="" ng-model="vm.dataSources.isSocialOn">Social data</label>
+            <div class="panel panel-info check-element animated-show" ng-show="vm.dataSources.isSocialOn">
+              <b>Please login to facebook</b>
+              <br></br>
+            </div>
+          </div>
+          <div class="checkbox disabled">
+            <label><input type="checkbox" value="" ng-model="vm.dataSources.isHealthOn" disabled>Health data</label>
+          </div>
+          <br>
+          <fb:login-button length="long" background="light" perms="email" size="medium" onlogin="loginWithFacebookConnect()">Login to facebook</fb:login-button>
+          <div
+          class="fb-like"
+          data-share="true"
+          data-width="450"
+          data-show-faces="true">
         </div>
-
+        <input type="submit" class="btn btn-primary" value="Create"/>
+      </form>
     </div>
+  </div>
+
+</div>
 </div>
