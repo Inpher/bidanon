@@ -35,7 +35,7 @@ git clone https://github.com/Inpher/six-hackathon.git
 ```
 ```
 # Download dependencies
-cd bidme
+cd six-hackathon/bidme
 npm install && bower install
 
 # Start node server
