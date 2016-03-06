@@ -431,8 +431,8 @@ function createAndSignContract(publicData, lenderPKey) {
 			contractData["lenderEncKey"] = lenderEncKey; 
 			// formatted content 
 			formattedContentStr = JSON.stringify(formattedContent);
-			contractData["formattedContent"] = formattedContent; 
-			return sign(contractStringStr, keyRing.skeySign);	  				
+			contractData["formattedContent"] = formattedContentStr; 
+			return sign(formattedContentStr, keyRing.skeySign);	  				
 		}).then( function(sig) {
 			contractData["borrowerSignature"] = sig; 
 			return resolve(contractData); 
