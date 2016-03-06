@@ -53,7 +53,7 @@ html, body {
 body {
 	background-image: url("../css/background.png");
 	background-repeat: no-repeat;
-	background-size: auto 100%;
+	background-size: auto auto;
     background-repeat: no-repeat;
     background-position: left top;
 }
