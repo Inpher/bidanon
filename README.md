@@ -52,7 +52,27 @@ currently only Chrome is supported!
 
 # Under the hood
 ## Basic Idea
-The idea is to match borrowers with lenders anonymously based on objective criteria. Once the match has been done, the transaction is settle and identities are exchanged. This means that all sensitive information is processed on the client and only anonymized data is store on the server. The private data is dumped in an encrypted blob and only made available to the lender once the match is completed.
+The idea is to match borrowers with lenders anonymously based on objective criteria. Once the match has been done, the transaction is settled and identities are exchanged. This means that all sensitive information is processed on the client and only anonymized data is stored on the server. The private data is dumped in an encrypted blob and only made available to the lender once the match is completed. 
+
+### Creating and Signing Contracts
+Once the lender accepts a loan proposal (bid), the identities are revealed and a contract is created. The contract is cryptographically signed by the borrower, the private data (including identities) is encrypted with public keys for both the borrower and the lender (on the borrower side) so that it remains invisible. The contract is then sent to the lender (the bank) to reveal the private data (after decryption) and sign the final contract with the bank's signing key. The server is capable of verifying the integrity and the authenticity of the contract without having the private information (a blind signature). 
+
+### Testing signing contracts in the Chrome JS developer console
+You can do unit tests for signing contracts from the console via the following steps: 
+- [Login](http://localhost:3000) as a user (borrower) from the browser 
+- From the Chrome browser javascript console, run the following function: 
+```
+> testEncryptedContractsGeneration()
+```
+You will see three outputs: 
+- the initial contract generated, signed and encrypted by the borrower as it will be stored in the server database 
+- the version of the contract received and decrypted by the lender (for review) 
+- the final version containing the signature of both the borrower and the lender. 
+
+You can see the test code in 
+```
+$PROJECT_HOME/bidme/public/scripts/src/contractscheme.js
+```
 
 ## Financial Score
 Sample financial information is located in:
