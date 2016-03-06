@@ -386,3 +386,28 @@ function getKeyringFromTheSession() {
     });
 }
 
+function createAndSignContract(publicData, keyRing) {
+	// assume extracted from the database 
+	var privateDataBorrower = { name:"John Smith" , age:30 , address:"330N Southcreek Rd., Mississauga, ON, Canada" };
+	var privateDataLender = { bank:"The Missisauga Food Bank" , address:"3121 Universal Dr., Mississauga, ON, Canada" };
+	var loanAmount = publicData["loanAmount"];
+	var interestRate = publicData["interestRate"];
+	var maturity = publicData["maturity"]; 
+
+	return new Promise(function(resolve, reject) {
+		var contractString = { 
+			"publicData": publicData, 
+			"privateDataBorrower": privateDataBorrower, 
+			"privateDataLender": privateDataLender 
+		}; 
+		// sign the current contract string and add signature to the contract 
+		getKeyringFromTheSession().then( function(keyRing) {
+			return sign(contractString, keyRing.skeySign); 	
+		}).then( function(sig) {
+			contractString["borrowerSignature"] = sig; 
+			return resolve(contractString); 
+		}).catch(function (err) {
+	    	return reject(err);
+		}); 
+	});  
+}
