@@ -42,6 +42,10 @@ npm install && bower install
 node server.js
 ```
 # Start web application
+=========>>>>
+currently only Chrome is supported!
+<<<<==========
+
 [Open Browser: http://localhost:3000](http://localhost:3000)
 
 [Register as a bank](http://localhost:3000/#/registerBank)
