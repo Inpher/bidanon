@@ -45,7 +45,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="bid in vm.bids" ng-click="vm.showProfile(bid)">
+                    <tr ng-repeat="bid in vm.bids">
                         <td class="text-center" ng-hide="request.modify">{{bid.score}}</td>
                         <td class="text-center" ng-hide="request.modify">{{bid.intRate}}</td>
                         <td class="text-center" ng-hide="request.modify">{{bid.maturity}}</td>
@@ -83,14 +83,12 @@
                     <table class="table table-condensed table-hover">
                         <thead>
                         <tr>
-                            <th class="text-center" width="30%">Score</th>
                             <th class="text-center" width="30%">Amount (CHF)</th>
                             <th class="text-center" width="30%">Maturity (Years)</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="request in vm.clientRequests" >
-                            <td class="text-center" ng-hide="request.modify">{{request.score}}</td>
                             <td class="text-center" ng-hide="request.modify">{{request.amount}}</td>
                             <td class="text-center" ng-hide="request.modify">{{request.maturity}}</td>
                         </tr>
@@ -111,19 +109,29 @@
                 <table class="table table-condensed table-hover">
                     <thead>
                     <tr>
-                        <th class="text-center" width="30%">Score</th>
                         <th class="text-center" width="30%">Interest Rate (%)</th>
                         <th class="text-center" width="30%">Maturity (Years)</th>
                         <th class="text-center" width="30%">Status</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="bid in vm.clientBids" ng-click="vm.showProfile(bid)">
-                        <td class="text-center" ng-hide="request.modify">{{bid.score}}</td>
+                    <tr ng-repeat="bid in vm.clientBids">
                         <td class="text-center" ng-hide="request.modify">{{bid.intRate}}</td>
                         <td class="text-center" ng-hide="request.modify">{{bid.maturity}}</td>
-                        <td class="text-center" ng-hide"bid.status == 'NEW'" ng-click="vm.accept(bid)">{{bid.status}}</td>
-                        <td class="text-center" ng-hide"bid.status != 'NEW'" >{{bid.status}}</td>
+                        <td class="text-center" ng-show="bid.status == 'NEW'" ng-click="vm.accept(bid)">
+                           <button type="button" class="btn btn-primary btn-sm">
+                               <span class="glyphicon glyphicon-ok"></span> Accept
+                           </button></td>
+                       <td class="text-center" ng-show="bid.status == 'DONE'" >
+                           <button type="button" class="btn btn-primary btn-sm">
+                               <span class="glyphicon glyphicon-bitcoin"></span> Done
+                           </button>
+                       </td>
+                       <td class="text-center" ng-show="bid.status == 'IN_PROGRESS'" >
+                           <button type="button" class="btn btn-primary btn-sm">
+                               <span class="glyphicon glyphicon-hourglass"></span> In Progress
+                           </button>
+                       </td>
                     </tr>
 
                     </tbody>
