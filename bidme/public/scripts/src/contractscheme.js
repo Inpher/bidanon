@@ -409,7 +409,6 @@ function createAndSignContract(publicData, keyRing, lenderPKey) {
 			"privateDataLender": privateDataLender 
 		};
 
-		// sign the current contract string and add signature to the contract 
 		getKeyringFromTheSession().then( function(keyRing) {
 			var contractData = { 
 				"publicInfo": publicData, 
@@ -443,4 +442,35 @@ function createAndSignContract(publicData, keyRing, lenderPKey) {
 	    	return reject(err);
 		});  
 	});
+}
+
+function decryptPrivateInfo(contractData) {
+	// TODO: contract data should not contain publicInfo and formattedInfo - 
+	//       these can be recalculated by the server and the client too. 
+	return new Promise(function(resolve, reject) {
+		var endPrivateInfo = contractData["encPrivateInfo"];
+		getKeyringFromTheSession().then( function(keyRing) {
+			var ct = { "ct":encPrivateInfo, "enckey":contractData["lenderEncKey"] }; 
+			// decrypt private info 
+			return decrypt(ct, keyRing.skeyEncrypt);
+		}).then(function(ptext) {
+			return resolve(JSON.parse(ptext)); 
+		}).catch(function(err) {
+			return reject(err); 
+		}); 
+	}); 
+}
+
+function lenderSign(contractData) {
+	return new Promise(function(resolve, reject) {
+		var formattedContent = contractData["formattedContent"];
+		getKeyringFromTheSession().then( function(keyRing) { 
+			return sign(formattedContent, keyRing.skeySign);
+		}).then(function(sig) {
+			contractData["lenderSignature"] = sig; 
+			return resolve(contractData); 
+		}).catch(function(err) {
+			return reject(err); 
+		}); 
+	});	
 }
