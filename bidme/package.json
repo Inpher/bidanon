@@ -5,7 +5,7 @@
   "main": "views/index.html",
   "dependencies": {
     "connect-flash": "*",
-    "ejs": "~0.7.1",
+    "ejs": "*",
     "express": "~3.2.6",
     "grunt": "*",
     "grunt-bower-installer": "*",
